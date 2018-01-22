@@ -1,11 +1,11 @@
-var webpack = require('webpack');
-var path = require('path');
-var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-var env = process.env.WEBPACK_ENV;
+const webpack = require('webpack');
+const path = require('path');
+const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+const env = process.env.WEBPACK_ENV;
 
-var libraryName = 'wait-until-promise';
-var plugins = [],
-  outputFile;
+const libraryName = 'wait-until-promise';
+const plugins = [];
+let outputFile;
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({
@@ -16,11 +16,11 @@ if (env === 'build') {
   outputFile = libraryName + '.js';
 }
 
-var config = {
-  entry: __dirname + '/index.js',
+const config = {
+  entry: path.resolve('./index.js'),
   devtool: 'source-map',
   output: {
-    path: __dirname + '/lib',
+    path: path.resolve('./lib'),
     filename: outputFile,
     library: libraryName,
     libraryTarget: 'umd',
@@ -38,7 +38,7 @@ var config = {
       }
     }, {
       test: /(\.jsx|\.js)$/,
-      loader: "eslint-loader",
+      loader: 'eslint-loader',
       exclude: /node_modules/
     }]
   },
