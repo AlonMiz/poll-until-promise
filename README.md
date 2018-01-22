@@ -1,29 +1,33 @@
 # Wait Until Promise
 
-/** wait until the executed promise resolved to a true value,
- *  execute it every x milliseconds and stop after y milliseconds
- *  example
+Wait until the executed promise resolved to a true value,
+Execute it every x milliseconds and stop after y milliseconds.
+
+
+## Install
+`npm install wait-until-promise`
+
+## Usage
 
 ```js
-  var later = +Date.now() + 5000;
-  WaitUntil()
-      .stopAfter(30 * 1000)
-      .tryEvery(2 * 1000)
-      .stopOnFailure(true)
-      .execute(function () {
-         var promise = Q.defer()
-         if (+Date.now() >= later) {
-             promise.resolve('wow'); //some true value
-         } else {
-             promise.resolve(false);
-         }
-         return promise.promise;
-      })
-      .then(function () {
-             console.log('YEY')
-      })
-      .catch(function(){
-             console.log('AYY')
-      });
+const later = +Date.now() + 5000;
 
-/
+WaitUntilPromise()
+    .stopAfter(30 * 1000)
+    .tryEvery(2 * 1000)
+    .stopOnFailure(true) //Ignore errors
+    .execute(() => {
+        return new Promise(resolve, reject) => {
+            if (+Date.now() >= later) {
+                return resolve(true); //some truthy value
+            }
+            reject(false);
+        }
+    })
+    .then(() => {
+        console.log('Yey')
+    })
+    .catch(() => {
+        console.log('Ay')
+    });
+```
