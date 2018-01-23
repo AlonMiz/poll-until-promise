@@ -13,7 +13,8 @@ Execute it every x milliseconds and stop after y milliseconds.
 const later = Date.now() + 20 * 1000;
 const pollUntil = require('poll-until-promise');
 
-let pollUntilPromise = pollUntil()
+let pollUntilPromise = new pollUntil();
+pollUntilPromise
     .stopAfter(30 * 1000)
     .tryEvery(2 * 1000)
     .stopOnFailure(false) //Ignore errors
@@ -30,17 +31,31 @@ let pollUntilPromise = pollUntil()
 
 ```
 
+## Options
+```js
+const options = {
+    interval: 1000,
+    timeout: 20 * 1000,
+    stopOnFailure: false
+};
+let pollUntilPromise = new pollUntil(options);
+```
+
+
 ## Methods
 
 * isResolved
 ```js
 pollUntilPromise.isResolved() // false
 ```
+
 * isWaiting
 ```js
 pollUntilPromise.isWaiting() // true
 ```
+
 * getPromise
 ```js
 pollUntilPromise.getPromise().then(() => console.log('OMG')) //OMG
 ```
+
