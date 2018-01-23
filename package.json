@@ -6,6 +6,14 @@
   "directories": {
     "test": "test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlonMiz/poll-until-promise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlonMiz/poll-until-promise"
+  },
+  "homepage": "https://github.com/AlonMiz/poll-until-promise#readme",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack",
     "build-win": "SET \"WEBPACK_ENV=build\" && webpack",
