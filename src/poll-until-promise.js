@@ -2,9 +2,9 @@ class PollUntil {
   constructor(options = {}) {
     this._interval = options.interval || 1000;
     this._timeout = options.timeout || 20 * 1000;
+    this._stopOnFailure = options.stopOnFailure || false;
     this._isWaiting = false;
     this._isResolved = false;
-    this._stopOnFailure = false;
   }
 
   tryEvery(interval) {
