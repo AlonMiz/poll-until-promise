@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/AlonMiz/wait-until-promise.svg?branch=master)](https://travis-ci.org/AlonMiz/wait-until-promise)
-# Wait Until Promise
+# Poll Until Promise
 Wait until the executed promise resolved to a true value,
 Execute it every x milliseconds and stop after y milliseconds.
 
