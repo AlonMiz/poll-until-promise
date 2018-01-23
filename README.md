@@ -1,5 +1,4 @@
 # Wait Until Promise
-
 Wait until the executed promise resolved to a true value,
 Execute it every x milliseconds and stop after y milliseconds.
 
@@ -15,7 +14,7 @@ const later = +Date.now() + 5000;
 WaitUntilPromise()
     .stopAfter(30 * 1000)
     .tryEvery(2 * 1000)
-    .stopOnFailure(true) //Ignore errors
+    .stopOnFailure(false) //Ignore errors
     .execute(() => {
         return new Promise(resolve, reject) => {
             if (+Date.now() >= later) {
@@ -24,10 +23,6 @@ WaitUntilPromise()
             reject(false);
         }
     })
-    .then(() => {
-        console.log('Yey')
-    })
-    .catch(() => {
-        console.log('Ay')
-    });
+    .then((value) => console.log('Yey', value))
+    .catch((err) => console.log(err));
 ```
