@@ -1,18 +1,18 @@
-[![Build Status](https://travis-ci.org/AlonMiz/wait-until-promise.svg?branch=master)](https://travis-ci.org/AlonMiz/wait-until-promise)
+[![Build Status](https://travis-ci.org/AlonMiz/poll-until.svg?branch=master)](https://travis-ci.org/AlonMiz/poll-until)
 # Poll Until Promise
 Wait until the executed promise resolved to a true value,
 Execute it every x milliseconds and stop after y milliseconds.
 
 
 ## Install
-`npm install wait-until-promise`
+`npm install poll-until`
 
 ## Usage
 
 ```js
 const later = Date.now() + 20 * 1000;
 
-WaitUntilPromise()
+PollUntil()
     .stopAfter(30 * 1000)
     .tryEvery(2 * 1000)
     .stopOnFailure(false) //Ignore errors

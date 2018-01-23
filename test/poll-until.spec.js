@@ -3,7 +3,7 @@ const expect = chai.expect;
 const spies = require('chai-spies');
 chai.use(spies);
 
-const WaitUntilPromise = require('../src/wait-until-promise');
+const PollUntil = require('../src/poll-until');
 
 describe('Unit: Wait Until Factory', () => {
   var options = {
@@ -35,42 +35,42 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should create the default wait params', () => {
-    var waitUntil = new WaitUntilPromise();
-    expect(waitUntil._interval).to.equal(1000);
-    expect(waitUntil._timeout).to.equal(20 * 1000);
+    var pollUntil = new PollUntil();
+    expect(pollUntil._interval).to.equal(1000);
+    expect(pollUntil._timeout).to.equal(20 * 1000);
   });
 
   it('should apply options with pre defined option object', () => {
-    var waitUntil = new WaitUntilPromise(options);
-    expect(waitUntil._interval).to.equal(options.interval);
-    expect(waitUntil._timeout).to.equal(options.timeout);
+    var pollUntil = new PollUntil(options);
+    expect(pollUntil._interval).to.equal(options.interval);
+    expect(pollUntil._timeout).to.equal(options.timeout);
   });
 
   it('should apply options by functional insert', () => {
-    var waitUntil = new WaitUntilPromise()
+    var pollUntil = new PollUntil()
       .tryEvery(options.interval)
       .stopAfter(options.timeout);
 
-    expect(waitUntil._interval).to.equal(options.interval);
-    expect(waitUntil._timeout).to.equal(options.timeout);
+    expect(pollUntil._interval).to.equal(options.interval);
+    expect(pollUntil._timeout).to.equal(options.timeout);
   });
 
   it('should execute runFunctions', () => {
-    var waitUntil = new WaitUntilPromise();
-    chai.spy.on(waitUntil, '_runFunction');
+    var pollUntil = new PollUntil();
+    chai.spy.on(pollUntil, '_runFunction');
 
-    waitUntil
+    pollUntil
       .tryEvery(options.interval)
       .stopAfter(options.timeout)
       .execute(someRandPromise);
 
-    expect(waitUntil._runFunction).to.have.been.called();
+    expect(pollUntil._runFunction).to.have.been.called();
   });
 
   it('should resolve the promise', (done) => {
-    var waitUntil = new WaitUntilPromise();
+    var pollUntil = new PollUntil();
 
-    waitUntil
+    pollUntil
       .tryEvery(options.interval)
       .stopAfter(options.timeout)
       .execute(someRandPromise)
@@ -81,10 +81,10 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should resolve a stubborn promise after few attempts', (done) => {
-    var waitUntil = new WaitUntilPromise();
+    var pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
 
-    waitUntil
+    pollUntil
       .tryEvery(1)
       .stopAfter(options.timeout)
       .execute(someRandPromise)
@@ -95,12 +95,12 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should reject a failed promise after timeout', (done) => {
-    var waitUntil = new WaitUntilPromise();
+    var pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
 
-    chai.spy.on(waitUntil, '_shouldStopTrying', () => true);
+    chai.spy.on(pollUntil, '_shouldStopTrying', () => true);
 
-    waitUntil
+    pollUntil
       .tryEvery(options.interval)
       .stopAfter(options.timeout)
       .execute(someRandPromise)
@@ -111,25 +111,25 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should execute a second waiting when waiting is done (exceeded timeout) but not resolved', (done) => {
-    var waitUntil = new WaitUntilPromise();
-    waitUntil
+    var pollUntil = new PollUntil();
+    pollUntil
       .tryEvery(5)
       .stopAfter(10)
       .execute(() => Promise.resolve(false))
       .catch(() => {
-        expect(waitUntil.isWaiting()).to.equal(false);
-        expect(waitUntil.isResolved()).to.equal(false);
+        expect(pollUntil.isWaiting()).to.equal(false);
+        expect(pollUntil.isResolved()).to.equal(false);
       });
 
 
-    waitUntil
+    pollUntil
       .tryEvery(5)
       .stopAfter(10)
       .execute(() => Promise.resolve(true))
       .then((value) => {
         expect(value).to.equal(true);
-        expect(waitUntil.isWaiting()).to.equal(false);
-        expect(waitUntil.isResolved()).to.equal(true);
+        expect(pollUntil.isWaiting()).to.equal(false);
+        expect(pollUntil.isResolved()).to.equal(true);
         done();
       });
   });

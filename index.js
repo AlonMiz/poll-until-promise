@@ -1,1 +1,1 @@
-module.exports = require('./src/wait-until-promise');
+module.exports = require('./src/poll-until');

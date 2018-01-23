@@ -1,4 +1,4 @@
-class WaitUntilPromise {
+class PollUntil {
   constructor(options = {}) {
     this._interval = options.interval || 1000;
     this._timeout = options.timeout || 20 * 1000;
@@ -79,4 +79,4 @@ class WaitUntilPromise {
   }
 }
 
-module.exports = WaitUntilPromise;
+module.exports = PollUntil;
