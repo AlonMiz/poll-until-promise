@@ -30,7 +30,7 @@ let pollUntilPromise = pollUntil()
 
 ```
 
-#Methods
+## Methods
 
 * isResolved
 ```js
