@@ -3,7 +3,7 @@ const path = require('path');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const env = process.env.WEBPACK_ENV;
 
-const libraryName = 'poll-until';
+const libraryName = 'poll-until-promise';
 const plugins = [];
 let outputFile;
 

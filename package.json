@@ -1,5 +1,5 @@
 {
-  "name": "poll-until",
+  "name": "poll-until-promise",
   "version": "1.0.0",
   "description": "Wait until and try repeatedly for a promise to be resolved/return true",
   "main": "index.js",
