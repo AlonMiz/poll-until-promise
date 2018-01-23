@@ -24,5 +24,5 @@ WaitUntilPromise()
         }
     })
     .then((value) => console.log('Yey', value))
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 ```
