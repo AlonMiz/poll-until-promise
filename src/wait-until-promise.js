@@ -1,17 +1,3 @@
-Promise.defer = () => {
-  var resolve;
-  var reject;
-  var promise = new Promise(() => {
-    resolve = arguments[0];
-    reject = arguments[1];
-  });
-  return {
-    resolve: resolve,
-    reject: reject,
-    promise: promise
-  };
-};
-
 class WaitUntilPromise {
   constructor(options = {}) {
     this._interval = options.interval || 1000;
@@ -30,17 +16,20 @@ class WaitUntilPromise {
     return this;
   }
   execute(execute) {
-    this.defer = Promise.defer();
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
     this.executeFn = execute;
     this.start = Date.now();
     this._isWaiting = true;
 
     this._runFunction();
 
-    return this.defer.promise;
+    return this.promise;
   }
   getPromise() {
-    return this.defer.promise;
+    return this.promise;
   }
   isResolved() {
     return this._isResolved;
@@ -67,14 +56,14 @@ class WaitUntilPromise {
   _runFunction() {
     if (this._shouldStopTrying()) {
       this._isWaiting = false;
-      this.defer.reject('Failed to wait');
+      this.reject('Failed to wait');
       return;
     }
 
     this.executeFn()
       .then((result) => {
         if (result) {
-          this.defer.resolve(result);
+          this.resolve(result);
           this._isWaiting = false;
           this._isResolved = true;
           return;
@@ -83,7 +72,7 @@ class WaitUntilPromise {
       })
       .catch((err) => {
         if (this._stopOnFailure) {
-          return this.defer.reject(err);
+          return this.reject(err);
         }
         return this._executeAgain();
       });

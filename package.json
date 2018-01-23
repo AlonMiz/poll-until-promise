@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "WEBPACK_ENV=build webpack",
+    "build-win": "SET \"WEBPACK_ENV=build\" && webpack",
     "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch",
     "dev-win": "SET \"NODE_ENV=local\" && webpack --progress --colors --watch",
     "test": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js"

@@ -3,7 +3,7 @@ const expect = chai.expect;
 const spies = require('chai-spies');
 chai.use(spies);
 
-const WaitUntilPromise = require('../lib/wait-until-promise');
+const WaitUntilPromise = require('../src/wait-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   var options = {
@@ -16,16 +16,16 @@ describe('Unit: Wait Until Factory', () => {
   var shouldHaltPromiseResolve = false;
 
   var someRandPromise = (timeout = promiseTimeout) => {
-    var defer = Promise.defer();
-    setTimeout(() => {
-      if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
-        defer.resolve(false);
-        tryingAttemptsRemaining--;
-      } else {
-        defer.resolve(true);
-      }
-    }, timeout);
-    return defer.promise;
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
+          resolve(false);
+          tryingAttemptsRemaining--;
+        } else {
+          resolve(true);
+        }
+      }, timeout);
+    });
   };
 
 
