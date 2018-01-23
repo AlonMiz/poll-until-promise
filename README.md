@@ -10,7 +10,7 @@ Execute it every x milliseconds and stop after y milliseconds.
 ## Usage
 
 ```js
-const later = +Date.now() + 5000;
+const later = +Date.now() + 20 * 1000;
 
 WaitUntilPromise()
     .stopAfter(30 * 1000)
