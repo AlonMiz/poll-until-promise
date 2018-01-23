@@ -1,1 +1,1 @@
-module.exports = require('./lib/poll-until-promise.min');
+module.exports = require('./src/poll-until-promise');

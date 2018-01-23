@@ -3,7 +3,7 @@ const expect = chai.expect;
 const spies = require('chai-spies');
 chai.use(spies);
 
-const PollUntil = require('../src/poll-until-promise');
+const PollUntil = require('../lib/poll-until-promise.min');
 
 describe('Unit: Wait Until Factory', () => {
   var options = {
