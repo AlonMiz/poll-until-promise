@@ -11,7 +11,7 @@
     "build-win": "SET \"WEBPACK_ENV=build\" && webpack",
     "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch",
     "dev-win": "SET \"NODE_ENV=local\" && webpack --progress --colors --watch",
-    "test": "mocha --colors -w ./test/*.spec.js"
+    "test": "mocha --colors ./test/*.spec.js"
   },
   "keywords": [
     "wait",
