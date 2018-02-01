@@ -19,12 +19,12 @@ pollUntilPromise
     .tryEvery(2 * 1000)
     .stopOnFailure(false) //Ignore errors
     .execute(() => {
-        return new Promise(resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (+Date.now() >= later) {
                 return resolve(true); //some truthy value
             }
             reject(false);
-        }
+        })
     })
     .then((value) => console.log('Yey', value))
     .catch((err) => console.error(err));

@@ -1,3 +1,6 @@
+const errors = {
+  NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.'
+};
 class PollUntil {
   constructor(options = {}) {
     this._interval = options.interval || 1000;
@@ -15,12 +18,13 @@ class PollUntil {
     this._timeout = timeout;
     return this;
   }
-  execute(execute) {
+  execute(executeFn) {
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
-    this.executeFn = execute;
+    this._executeFn = executeFn;
+    this._validateExecution();
     this.start = Date.now();
     this._isWaiting = true;
 
@@ -42,6 +46,11 @@ class PollUntil {
     return this;
   }
 
+  _validateExecution() {
+    if (typeof this._executeFn !== 'function') {
+      throw new Error(errors.NOT_FUNCTION);
+    }
+  }
   _timeFromStart() {
     return Date.now() - this.start;
   }
@@ -60,7 +69,11 @@ class PollUntil {
       return;
     }
 
-    this.executeFn()
+    let executor = this._executeFn();
+    if (typeof executor.then !== 'function') {
+      executor = new Promise(resolve => resolve(executor));
+    }
+    executor
       .then((result) => {
         if (result) {
           this.resolve(result);

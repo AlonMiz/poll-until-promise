@@ -20,7 +20,7 @@ describe('Unit: Wait Until Factory', () => {
       setTimeout(() => {
         if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
           resolve(false);
-          tryingAttemptsRemaining--;
+          tryingAttemptsRemaining -= 1;
         } else {
           resolve(true);
         }
@@ -130,6 +130,27 @@ describe('Unit: Wait Until Factory', () => {
         expect(value).to.equal(true);
         expect(pollUntil.isWaiting()).to.equal(false);
         expect(pollUntil.isResolved()).to.equal(true);
+        done();
+      });
+  });
+
+  it('should throw an error if the execute function is not a function', (done) => {
+    var pollUntil = new PollUntil();
+    try {
+      pollUntil
+        .execute(5);
+    } catch (e) {
+      expect(e.message).to.contain('executor is not a function.');
+      done();
+    }
+  });
+
+  it('should convert a static function to a promise', (done) => {
+    var pollUntil = new PollUntil();
+    pollUntil
+      .execute(() => 5)
+      .then((value) => {
+        expect(value).to.equal(5);
         done();
       });
   });
