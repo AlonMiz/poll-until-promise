@@ -70,7 +70,7 @@ class PollUntil {
     }
 
     let executor = this._executeFn();
-    if (typeof executor.then !== 'function') {
+    if (typeof executor !== 'object' || typeof executor.then !== 'function') {
       executor = new Promise(resolve => resolve(executor));
     }
     executor

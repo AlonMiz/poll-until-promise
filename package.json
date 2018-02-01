@@ -1,6 +1,6 @@
 {
   "name": "poll-until-promise",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Try repeatedly for a promise to be resolved/return true",
   "main": "index.js",
   "directories": {
@@ -19,7 +19,9 @@
     "build-win": "SET \"WEBPACK_ENV=build\" && webpack",
     "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch",
     "dev-win": "SET \"NODE_ENV=local\" && webpack --progress --colors --watch",
-    "test": "mocha --colors ./test/*.spec.js"
+    "test": "mocha --colors ./test/*.spec.js",
+    "test-dev": "mocha --colors -w ./test/*.spec.js"
+
   },
   "keywords": [
     "wait",

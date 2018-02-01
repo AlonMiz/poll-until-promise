@@ -35,19 +35,19 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should create the default wait params', () => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     expect(pollUntil._interval).to.equal(1000);
     expect(pollUntil._timeout).to.equal(20 * 1000);
   });
 
   it('should apply options with pre defined option object', () => {
-    var pollUntil = new PollUntil(options);
+    const pollUntil = new PollUntil(options);
     expect(pollUntil._interval).to.equal(options.interval);
     expect(pollUntil._timeout).to.equal(options.timeout);
   });
 
   it('should apply options by functional insert', () => {
-    var pollUntil = new PollUntil()
+    const pollUntil = new PollUntil()
       .tryEvery(options.interval)
       .stopAfter(options.timeout);
 
@@ -56,7 +56,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should execute runFunctions', () => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     chai.spy.on(pollUntil, '_runFunction');
 
     pollUntil
@@ -68,7 +68,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should resolve the promise', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
 
     pollUntil
       .tryEvery(options.interval)
@@ -81,7 +81,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should resolve a stubborn promise after few attempts', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
 
     pollUntil
@@ -95,7 +95,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should reject a failed promise after timeout', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
 
     chai.spy.on(pollUntil, '_shouldStopTrying', () => true);
@@ -111,7 +111,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should execute a second waiting when waiting is done (exceeded timeout) but not resolved', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     pollUntil
       .tryEvery(5)
       .stopAfter(10)
@@ -135,7 +135,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should throw an error if the execute function is not a function', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     try {
       pollUntil
         .execute(5);
@@ -146,9 +146,27 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should convert a static function to a promise', (done) => {
-    var pollUntil = new PollUntil();
+    const pollUntil = new PollUntil();
     pollUntil
       .execute(() => 5)
+      .then((value) => {
+        expect(value).to.equal(5);
+        done();
+      });
+  });
+
+  it('should convert a static function that sometimes return undefined to a promise', (done) => {
+    const pollUntil = new PollUntil();
+    let counter = 0;
+    pollUntil
+      .tryEvery(2)
+      .stopAfter(10)
+      .execute(() => {
+        if (counter > 0) {
+          return 5;
+        }
+        counter += 1;
+      })
       .then((value) => {
         expect(value).to.equal(5);
         done();
