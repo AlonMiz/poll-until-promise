@@ -3,6 +3,7 @@ const path = require('path');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const env = process.env.WEBPACK_ENV;
 
+const libraryWindowName = 'PollUntil';
 const libraryName = 'poll-until-promise';
 const plugins = [];
 let outputFile;
@@ -22,7 +23,7 @@ const config = {
   output: {
     path: path.resolve('./lib'),
     filename: outputFile,
-    library: libraryName,
+    library: libraryWindowName,
     libraryTarget: 'umd',
     umdNamedDefine: true
   },

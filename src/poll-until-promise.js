@@ -1,13 +1,20 @@
-const errors = {
-  NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.'
-};
 class PollUntil {
   constructor(options = {}) {
+    // Used for angularJs internal functions, eg. $interval, $q, $timeout
+    this._PromiseModule = options.Promise || Promise;
+    this._useNewPromise = options.useNewPromise !== false;
+    this._setTimeoutModule = options.setTimeout;
+
     this._interval = options.interval || 1000;
     this._timeout = options.timeout || 20 * 1000;
     this._stopOnFailure = options.stopOnFailure || false;
     this._isWaiting = false;
     this._isResolved = false;
+
+    this.ERRORS = {
+      NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
+      FAILED_TO_WAIT: 'Failed to wait'
+    };
   }
 
   tryEvery(interval) {
@@ -19,12 +26,11 @@ class PollUntil {
     return this;
   }
   execute(executeFn) {
-    this.promise = new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
     this._executeFn = executeFn;
+
+    this._applyPromiseHandlers();
     this._validateExecution();
+
     this.start = Date.now();
     this._isWaiting = true;
 
@@ -46,9 +52,21 @@ class PollUntil {
     return this;
   }
 
+
+  _applyPromiseHandlers() {
+    this.promise = this._getNewPromise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+  _getNewPromise(promiseFn) {
+    return this._useNewPromise ?
+      new this._PromiseModule(promiseFn) :
+      this._PromiseModule(promiseFn);
+  }
   _validateExecution() {
     if (typeof this._executeFn !== 'function') {
-      throw new Error(errors.NOT_FUNCTION);
+      throw new Error(this.ERRORS.NOT_FUNCTION);
     }
   }
   _timeFromStart() {
@@ -58,20 +76,25 @@ class PollUntil {
     return this._timeFromStart() > this._timeout;
   }
   _executeAgain() {
-    setTimeout(() => {
-      this._runFunction();
-    }, this._interval);
+    if (this._setTimeoutModule) {
+      this._setTimeoutModule(this._runFunction.bind(this), this._interval);
+    } else {
+      setInterval(this._runFunction.bind(this), this._interval);
+    }
+  }
+  _failedToWait() {
+    return `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
   }
   _runFunction() {
     if (this._shouldStopTrying()) {
       this._isWaiting = false;
-      this.reject('Failed to wait');
+      this.reject(this._failedToWait());
       return;
     }
 
     let executor = this._executeFn();
     if (typeof executor !== 'object' || typeof executor.then !== 'function') {
-      executor = new Promise(resolve => resolve(executor));
+      executor = this._getNewPromise(resolve => resolve(executor));
     }
     executor
       .then((result) => {

@@ -3,7 +3,7 @@ const expect = chai.expect;
 const spies = require('chai-spies');
 chai.use(spies);
 
-const PollUntil = require('../lib/poll-until-promise.min');
+const PollUntil = require('../lib/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   var options = {
@@ -105,7 +105,7 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .execute(someRandPromise)
       .catch((value) => {
-        expect(value).to.equal('Failed to wait');
+        expect(value).to.contain('Failed to wait');
         done();
       });
   });

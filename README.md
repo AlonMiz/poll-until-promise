@@ -10,22 +10,22 @@ Execute it every x milliseconds and stop after y milliseconds.
 ## Usage
 
 ```js
-const pollUntil = require('poll-until-promise');
+const PollUntil = require('poll-until-promise');
 
-const later = Date.now() + 20 * 1000; // 20 seconds into the future
+const later = Date.now() + 1 * 1000; // 1 seconds into the future
 
-let pollUntilPromise = new pollUntil();
+let pollUntilPromise = new PollUntil();
 pollUntilPromise
-    .stopAfter(30 * 1000)
-    .tryEvery(2 * 1000)
+    .stopAfter(2 * 1000)
+    .tryEvery(100)
     .stopOnFailure(false) //Ignore errors
     .execute(() => {
-        return new Promise((resolve, reject) => {
-            if (+Date.now() >= later) {
-                return resolve(true); //some truthy value
-            }
-            reject(false);
-        })
+    return new Promise((resolve, reject) => {
+        if (+Date.now() >= later) {
+        return resolve(true); //some truthy value
+        }
+        reject(false);
+    })
     })
     .then((value) => console.log('Yey', value))
     .catch((err) => console.error(err));
@@ -39,7 +39,7 @@ const options = {
     timeout: 20 * 1000,
     stopOnFailure: false
 };
-let pollUntilPromise = new pollUntil(options);
+let pollUntilPromise = new PollUntil(options);
 ```
 
 
@@ -63,13 +63,13 @@ pollUntilPromise.getPromise().then(() => console.log('OMG')) //OMG
 ## Another Example - Static Function
 
 ```js
-const pollUntil = require('poll-until-promise');
-const later = Date.now() + 20 * 1000; // 20 seconds into the future
+const PollUntil = require('poll-until-promise');
+const later = Date.now() + 1 * 1000; // 1 seconds into the future
 
-let pollUntilPromise = new pollUntil();
+let pollUntilPromise = new PollUntil();
 pollUntilPromise
-    .stopAfter(30 * 1000)
-    .tryEvery(2 * 1000)
+    .stopAfter(2 * 1000)
+    .tryEvery(100)
     .execute(() => {
         if (+Date.now() >= later) {
             return true;
