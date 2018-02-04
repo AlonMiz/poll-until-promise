@@ -2,7 +2,6 @@ class PollUntil {
   constructor(options = {}) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
     this._PromiseModule = options.Promise || Promise;
-    this._useNewPromise = options.useNewPromise !== false;
     this._setTimeoutModule = options.setTimeout;
 
     this._interval = options.interval || 1000;
@@ -54,15 +53,10 @@ class PollUntil {
 
 
   _applyPromiseHandlers() {
-    this.promise = this._getNewPromise((resolve, reject) => {
+    this.promise = new this._PromiseModule((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
-  }
-  _getNewPromise(promiseFn) {
-    return this._useNewPromise ?
-      new this._PromiseModule(promiseFn) :
-      this._PromiseModule(promiseFn);
   }
   _validateExecution() {
     if (typeof this._executeFn !== 'function') {
@@ -94,7 +88,7 @@ class PollUntil {
 
     let executor = this._executeFn();
     if (typeof executor !== 'object' || typeof executor.then !== 'function') {
-      executor = this._getNewPromise(resolve => resolve(executor));
+      executor = new this._PromiseModule(resolve => resolve(executor));
     }
     executor
       .then((result) => {
