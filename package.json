@@ -15,13 +15,10 @@
   },
   "homepage": "https://github.com/AlonMiz/poll-until-promise#readme",
   "scripts": {
-    "build": "WEBPACK_ENV=build webpack",
-    "build-win": "SET \"WEBPACK_ENV=build\" && webpack",
-    "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch",
-    "dev-win": "SET \"NODE_ENV=local\" && webpack --progress --colors --watch",
-    "test": "mocha --colors --exit ./test/*.spec.js",
-    "test-dev": "mocha --colors -w ./test/*.spec.js"
-
+    "build": "cross-env WEBPACK_ENV=build webpack",
+    "dev": "cross-env WEBPACK_ENV=dev webpack --progress --colors --watch",
+    "test": "nyc mocha --colors --exit ./test/*.spec.js",
+    "test-dev": "nyc mocha --colors -w ./test/*.spec.js"
   },
   "keywords": [
     "wait",
@@ -38,6 +35,8 @@
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "chai-spies": "^1.0.0",
+    "coveralls": "^3.0.0",
+    "cross-env": "^5.1.3",
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-loader": "^1.9.0",
@@ -47,6 +46,8 @@
     "karma-jasmine": "^1.1.1",
     "karma-mocha": "^1.3.0",
     "mocha": "^5.0.0",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^11.4.1",
     "webpack": "^3.10.0"
   }
 }

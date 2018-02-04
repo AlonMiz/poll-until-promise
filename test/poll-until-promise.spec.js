@@ -3,7 +3,7 @@ const expect = chai.expect;
 const spies = require('chai-spies');
 chai.use(spies);
 
-const PollUntil = require('../lib/poll-until-promise');
+const PollUntil = require('../src/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   var options = {
@@ -14,13 +14,16 @@ describe('Unit: Wait Until Factory', () => {
   var tryingAttempts = 3;
   var tryingAttemptsRemaining;
   var shouldHaltPromiseResolve = false;
+  var shouldRejectAfterHalt = false;
 
   var someRandPromise = (timeout = promiseTimeout) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
           resolve(false);
           tryingAttemptsRemaining -= 1;
+        } else if (shouldRejectAfterHalt) {
+          reject('rejected');
         } else {
           resolve(true);
         }
@@ -32,6 +35,7 @@ describe('Unit: Wait Until Factory', () => {
   beforeEach(() => {
     tryingAttemptsRemaining = tryingAttempts;
     shouldHaltPromiseResolve = false;
+    shouldRejectAfterHalt = false;
   });
 
   it('should create the default wait params', () => {
@@ -79,6 +83,34 @@ describe('Unit: Wait Until Factory', () => {
         done();
       });
   });
+  it('should resolve the promise', (done) => {
+    const pollUntil = new PollUntil();
+
+    pollUntil
+      .tryEvery(options.interval)
+      .stopAfter(options.timeout)
+      .execute(someRandPromise)
+      .then((value) => {
+        expect(value).to.equal(true);
+        done();
+      });
+  });
+
+  it('should get the promise', (done) => {
+    const pollUntil = new PollUntil();
+
+    pollUntil
+      .tryEvery(options.interval)
+      .stopAfter(options.timeout)
+      .execute(someRandPromise);
+
+    pollUntil
+      .getPromise()
+      .then((value) => {
+        expect(value).to.equal(true);
+        done();
+      });
+  });
 
   it('should resolve a stubborn promise after few attempts', (done) => {
     const pollUntil = new PollUntil();
@@ -106,6 +138,38 @@ describe('Unit: Wait Until Factory', () => {
       .execute(someRandPromise)
       .catch((value) => {
         expect(value).to.contain('Failed to wait');
+        done();
+      });
+  });
+
+  it('should reject a failed promise when should stop on failure is true', (done) => {
+    const pollUntil = new PollUntil();
+
+    pollUntil
+      .tryEvery(options.interval)
+      .stopAfter(options.timeout)
+      .stopOnFailure(true)
+      .execute(() => new Promise((resolve, reject) => {
+        reject('wow');
+      }))
+      .catch((error) => {
+        expect(error).to.contain('wow');
+        done();
+      });
+  });
+
+  it('should try again until rejected for a failed promise when should stop on failure is true', (done) => {
+    const pollUntil = new PollUntil();
+    shouldHaltPromiseResolve = true;
+    shouldRejectAfterHalt = true;
+
+    pollUntil
+      .tryEvery(options.interval)
+      .stopAfter(options.timeout)
+      .stopOnFailure(true)
+      .execute(someRandPromise)
+      .catch((error) => {
+        expect(error).to.contain('rejected');
         done();
       });
   });
