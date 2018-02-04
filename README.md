@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/AlonMiz/poll-until-promise.svg?branch=master)](https://travis-ci.org/AlonMiz/poll-until-promise)
+[![Coverage Status](https://coveralls.io/repos/github/AlonMiz/poll-until-promise/badge.svg?branch=master)](https://coveralls.io/github/AlonMiz/poll-until-promise?branch=master)
+
 # Poll Until Promise
 Wait until the executed promise resolved to a true value,
 Execute it every x milliseconds and stop after y milliseconds.
