@@ -1,7 +1,7 @@
 {
   "name": "poll-until-promise",
   "version": "1.2.2",
-  "description": "Try repeatedly for a promise to be resolved/return true",
+  "description": "Try repeatedly for a promise to be resolved",
   "main": "index.js",
   "directories": {
     "test": "test"
