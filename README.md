@@ -18,13 +18,13 @@ const later = Date.now() + 1 * 1000; // 1 seconds into the future
 
 let pollUntilPromise = new PollUntil();
 pollUntilPromise
-    .stopAfter(2 * 1000)
-    .tryEvery(100)
-    .stopOnFailure(false) //Ignore errors
+    .stopAfter(2 * 1000)    // Stop trying after 2 seconds
+    .tryEvery(100)          // Tries every 100ms (from the last failure)
+    .stopOnFailure(false)   // Ignore errors
     .execute(() => {
         return new Promise((resolve, reject) => {
             if (+Date.now() >= later) {
-            return resolve(true); //some truthy value
+            return resolve(true); // Some truthy value
             }
             reject(false);
         })
@@ -49,17 +49,17 @@ let pollUntilPromise = new PollUntil(options);
 
 * isResolved
 ```js
-pollUntilPromise.isResolved() // false
+pollUntilPromise.isResolved()
 ```
 
 * isWaiting
 ```js
-pollUntilPromise.isWaiting() // true
+pollUntilPromise.isWaiting()
 ```
 
 * getPromise
 ```js
-pollUntilPromise.getPromise().then(() => console.log('OMG')) //OMG
+pollUntilPromise.getPromise().then(() => console.log('OMG'))
 ```
 
 ## Another Example - Static Function
