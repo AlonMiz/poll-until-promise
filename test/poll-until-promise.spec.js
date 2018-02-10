@@ -6,24 +6,20 @@ chai.use(spies);
 const PollUntil = require('../src/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
-  var options = {
-    interval: 30,
-    timeout: 100
-  };
-  var promiseTimeout = 10;
-  var tryingAttempts = 3;
-  var tryingAttemptsRemaining;
-  var shouldHaltPromiseResolve = false;
-  var shouldRejectAfterHalt = false;
+  let options;
+  let promiseTimeout;
+  let tryingAttemptsRemaining;
+  let shouldHaltPromiseResolve;
+  let shouldRejectAfterHalt;
 
-  var someRandPromise = (timeout = promiseTimeout) => {
+  const someRandPromise = (timeout = promiseTimeout) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
           resolve(false);
           tryingAttemptsRemaining -= 1;
         } else if (shouldRejectAfterHalt) {
-          reject('rejected');
+          reject(new Error('rejected'));
         } else {
           resolve(true);
         }
@@ -33,9 +29,14 @@ describe('Unit: Wait Until Factory', () => {
 
 
   beforeEach(() => {
-    tryingAttemptsRemaining = tryingAttempts;
+    promiseTimeout = 10;
+    tryingAttemptsRemaining = 2;
     shouldHaltPromiseResolve = false;
     shouldRejectAfterHalt = false;
+    options = {
+      interval: 30,
+      timeout: 100
+    };
   });
 
   it('should create the default wait params', () => {
@@ -83,6 +84,7 @@ describe('Unit: Wait Until Factory', () => {
         done();
       });
   });
+
   it('should resolve the promise', (done) => {
     const pollUntil = new PollUntil();
 
@@ -113,7 +115,7 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('should resolve a stubborn promise after few attempts', (done) => {
-    const pollUntil = new PollUntil();
+    const pollUntil = new PollUntil({ verbose: true });
     shouldHaltPromiseResolve = true;
 
     pollUntil
@@ -150,26 +152,26 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .stopOnFailure(true)
       .execute(() => new Promise((resolve, reject) => {
-        reject('wow');
+        reject(new Error('wow'));
       }))
       .catch((error) => {
-        expect(error).to.contain('wow');
+        expect(error.message).to.contain('wow');
         done();
       });
   });
 
   it('should try again until rejected for a failed promise when should stop on failure is true', (done) => {
-    const pollUntil = new PollUntil();
+    const pollUntil = new PollUntil({ verbose: true });
     shouldHaltPromiseResolve = true;
     shouldRejectAfterHalt = true;
 
     pollUntil
-      .tryEvery(options.interval)
+      .tryEvery(1)
       .stopAfter(options.timeout)
       .stopOnFailure(true)
       .execute(someRandPromise)
       .catch((error) => {
-        expect(error).to.contain('rejected');
+        expect(error.message).to.contain('rejected');
         done();
       });
   });
@@ -211,6 +213,7 @@ describe('Unit: Wait Until Factory', () => {
 
   it('should convert a static function to a promise', (done) => {
     const pollUntil = new PollUntil();
+
     pollUntil
       .execute(() => 5)
       .then((value) => {
@@ -222,6 +225,7 @@ describe('Unit: Wait Until Factory', () => {
   it('should convert a static function that sometimes return undefined to a promise', (done) => {
     const pollUntil = new PollUntil();
     let counter = 0;
+
     pollUntil
       .tryEvery(2)
       .stopAfter(10)
@@ -230,9 +234,26 @@ describe('Unit: Wait Until Factory', () => {
           return 5;
         }
         counter += 1;
+        return undefined;
       })
       .then((value) => {
         expect(value).to.equal(5);
+        done();
+      });
+  });
+
+  it('should use an external setTimeout module', (done) => {
+    shouldHaltPromiseResolve = true;
+    tryingAttemptsRemaining = 2;
+
+    const pollUntil = new PollUntil({ setTimeout });
+
+    pollUntil
+      .tryEvery(1)
+      .stopAfter(options.timeout)
+      .execute(someRandPromise)
+      .then((value) => {
+        expect(value).to.equal(true);
         done();
       });
   });

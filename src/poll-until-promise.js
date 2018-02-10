@@ -3,12 +3,12 @@ class PollUntil {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
     this._PromiseModule = options.Promise || Promise;
     this._setTimeoutModule = options.setTimeout;
-
     this._interval = options.interval || 1000;
     this._timeout = options.timeout || 20 * 1000;
     this._stopOnFailure = options.stopOnFailure || false;
     this._isWaiting = false;
     this._isResolved = false;
+    this._verbose = options.verbose;
 
     this.ERRORS = {
       NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
@@ -33,6 +33,7 @@ class PollUntil {
     this.start = Date.now();
     this._isWaiting = true;
 
+    this._log('starting to execute');
     this._runFunction();
 
     return this.promise;
@@ -70,14 +71,17 @@ class PollUntil {
     return this._timeFromStart() > this._timeout;
   }
   _executeAgain() {
-    if (this._setTimeoutModule) {
+    this._log('executing again');
+    if (typeof this._setTimeoutModule === 'function') {
       this._setTimeoutModule(this._runFunction.bind(this), this._interval);
     } else {
-      setInterval(this._runFunction.bind(this), this._interval);
+      setTimeout(this._runFunction.bind(this), this._interval);
     }
   }
   _failedToWait() {
-    return `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    const waitError = `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    this._log(waitError);
+    return waitError;
   }
   _runFunction() {
     if (this._shouldStopTrying()) {
@@ -92,20 +96,29 @@ class PollUntil {
     }
     executor
       .then((result) => {
+        this._log(`then with results: ${result}`);
         if (result) {
           this.resolve(result);
           this._isWaiting = false;
           this._isResolved = true;
           return;
         }
+        if (`then execute again: ${result}`);
         this._executeAgain();
       })
       .catch((err) => {
         if (this._stopOnFailure) {
+          this._log(`stopped on failure with err: ${err}`);
           return this.reject(err);
         }
+        this._log(`catch with err: ${err}`);
         return this._executeAgain();
       });
+  }
+
+  _log(message) {
+    const Console = console;
+    if (Console && Console.log && this._verbose) Console.log(message);
   }
 }
 
