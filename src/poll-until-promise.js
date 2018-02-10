@@ -79,7 +79,7 @@ class PollUntil {
     }
   }
   _failedToWait() {
-    const waitError = `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    const waitError = new Error(`${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`);
     this._log(waitError);
     return waitError;
   }
@@ -96,14 +96,14 @@ class PollUntil {
     }
     executor
       .then((result) => {
-        this._log(`then with results: ${result}`);
         if (result) {
           this.resolve(result);
           this._isWaiting = false;
           this._isResolved = true;
+          this._log(`then done waiting with result: ${result}`);
           return;
         }
-        if (`then execute again: ${result}`);
+        this._log(`then execute again with result: ${result}`);
         this._executeAgain();
       })
       .catch((err) => {

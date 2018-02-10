@@ -135,16 +135,16 @@ describe('Unit: Wait Until Factory', () => {
     chai.spy.on(pollUntil, '_shouldStopTrying', () => true);
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(1)
+      .stopAfter(5)
       .execute(someRandPromise)
-      .catch((value) => {
-        expect(value).to.contain('Failed to wait');
+      .catch((error) => {
+        expect(error.message).to.contain('Failed to wait');
         done();
       });
   });
 
-  it('should reject a failed promise when should stop on failure is true', (done) => {
+  it('should reject a failed promise when stopOnFailure is true', (done) => {
     const pollUntil = new PollUntil();
 
     pollUntil
@@ -160,8 +160,8 @@ describe('Unit: Wait Until Factory', () => {
       });
   });
 
-  it('should try again until rejected for a failed promise when should stop on failure is true', (done) => {
-    const pollUntil = new PollUntil({ verbose: true });
+  it('should try again until rejected for a failed promise when stopOnFailure is true', (done) => {
+    const pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
     shouldRejectAfterHalt = true;
 
@@ -172,6 +172,21 @@ describe('Unit: Wait Until Factory', () => {
       .execute(someRandPromise)
       .catch((error) => {
         expect(error.message).to.contain('rejected');
+        done();
+      });
+  });
+
+  it('should fail wait after timeout', (done) => {
+    const pollUntil = new PollUntil();
+    shouldHaltPromiseResolve = true;
+    shouldRejectAfterHalt = true;
+
+    pollUntil
+      .tryEvery(1)
+      .stopAfter(5)
+      .execute(() => Promise.reject())
+      .catch((error) => {
+        expect(error.message).to.contain('Failed to wait');
         done();
       });
   });

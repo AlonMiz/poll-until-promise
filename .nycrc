@@ -1,7 +1,0 @@
-{
-  "reporter"   : ["text", "text-summary", "lcov", "html"],
-  "include"    : ["src/**/*.js"],
-  "sourceMap"  : false,
-  "instrument" : false,
-  "all"        : true
-}
