@@ -9,6 +9,7 @@ class PollUntil {
     this._isWaiting = false;
     this._isResolved = false;
     this._verbose = options.verbose;
+    this._Console = console;
 
     this.ERRORS = {
       NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
@@ -117,8 +118,7 @@ class PollUntil {
   }
 
   _log(message) {
-    const Console = console;
-    if (Console && Console.log && this._verbose) Console.log(message);
+    if (this._verbose && this._Console && this._Console.log) this._Console.log(message);
   }
 }
 
