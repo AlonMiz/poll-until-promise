@@ -20,7 +20,6 @@ let pollUntilPromise = new PollUntil();
 pollUntilPromise
     .stopAfter(2 * 1000)    // Stop trying after 2 seconds
     .tryEvery(100)          // Tries every 100ms (from the last failure)
-    .stopOnFailure(false)   // Ignore errors
     .execute(() => {
         return new Promise((resolve, reject) => {
             if (+Date.now() >= later) {
@@ -39,10 +38,10 @@ pollUntilPromise
 const options = {
     interval: 100,
     timeout: 1000,
-    stopOnFailure: false,
+    stopOnFailure: false, // Ignores promise rejections
     verbose: false,
 
-    //External Modules
+    // External Modules - e.g angularJs compatible
     setTimeout: $timeout,
     Promise: $q
 };
@@ -87,3 +86,6 @@ pollUntilPromise
     .catch((err) => console.error(err));
 
 ```
+
+## Used in AngularJs
+An AngularJs compatible library based on `poll-until-promise` [angular-wait-until](https://github.com/AlonMiz/angular-wait-until).
