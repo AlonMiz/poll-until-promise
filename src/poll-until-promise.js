@@ -3,8 +3,8 @@ class PollUntil {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
     this._PromiseModule = options.Promise || Promise;
     this._setTimeoutModule = options.setTimeout;
-    this._interval = options.interval || 1000;
-    this._timeout = options.timeout || 20 * 1000;
+    this._interval = options.interval || 100;
+    this._timeout = options.timeout || 1000;
     this._stopOnFailure = options.stopOnFailure || false;
     this._isWaiting = false;
     this._isResolved = false;

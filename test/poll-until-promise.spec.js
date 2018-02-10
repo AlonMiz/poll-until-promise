@@ -41,8 +41,8 @@ describe('Unit: Wait Until Factory', () => {
 
   it('should create the default wait params', () => {
     const pollUntil = new PollUntil();
-    expect(pollUntil._interval).to.equal(1000);
-    expect(pollUntil._timeout).to.equal(20 * 1000);
+    expect(pollUntil._interval).to.equal(100);
+    expect(pollUntil._timeout).to.equal(1000);
   });
 
   it('should apply options with pre defined option object', () => {

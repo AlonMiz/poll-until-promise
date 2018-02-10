@@ -37,9 +37,14 @@ pollUntilPromise
 ## Options
 ```js
 const options = {
-    interval: 1000,
-    timeout: 20 * 1000,
-    stopOnFailure: false
+    interval: 100,
+    timeout: 1000,
+    stopOnFailure: false,
+    verbose: false,
+
+    //External Modules
+    setTimeout: $timeout,
+    Promise: $q
 };
 let pollUntilPromise = new PollUntil(options);
 ```
