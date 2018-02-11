@@ -13,7 +13,7 @@ class PollUntil {
 
     this.ERRORS = {
       NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
-      FAILED_TO_WAIT: 'Failed to wait'
+      FAILED_TO_WAIT: 'Failed to wait',
     };
   }
 

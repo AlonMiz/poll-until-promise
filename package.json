@@ -53,11 +53,14 @@
     "webpack": "^3.10.0"
   },
   "nyc": {
-    "reporter": ["text", "text-summary", "lcov", "html"],
-    "include": ["src/**/*.js"],
-    "require": [
-      "babel-register"
+    "reporter": [
+      "text",
+      "text-summary",
+      "lcov",
+      "html"
     ],
+    "include": ["src/**/*.js"],
+    "require": ["babel-register"],
     "sourceMap": false,
     "instrument": true
   }

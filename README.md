@@ -1,5 +1,7 @@
-[![Build Status](https://travis-ci.org/AlonMiz/poll-until-promise.svg?branch=master)](https://travis-ci.org/AlonMiz/poll-until-promise)
-[![Coverage Status](https://coveralls.io/repos/github/AlonMiz/poll-until-promise/badge.svg?branch=master)](https://coveralls.io/github/AlonMiz/poll-until-promise?branch=master)
+[![Build Status][travis-image]][travis-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![NPM Version][npm-image]][npm-url]
+
 
 # Poll Until Promise
 Wait until the executed promise resolved to a true value,
@@ -89,3 +91,12 @@ pollUntilPromise
 
 ## Used in AngularJs
 An AngularJs compatible library based on `poll-until-promise` [angular-wait-until](https://github.com/AlonMiz/angular-wait-until).
+
+[travis-url]: https://travis-ci.org/AlonMiz/poll-until-promise
+[travis-image]: https://travis-ci.org/AlonMiz/poll-until-promise.svg?branch=master
+
+[npm-url]: https://npmjs.org/package/poll-until-promise
+[npm-image]: https://img.shields.io/npm/v/poll-until-promise.svg
+
+[coveralls-url]: https://coveralls.io/github/AlonMiz/poll-until-promise
+[coveralls-image]: https://img.shields.io/coveralls/AlonMiz/poll-until-promise.svg
