@@ -1,6 +1,6 @@
 {
   "name": "poll-until-promise",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Try repeatedly for a promise to be resolved",
   "main": "index.js",
   "directories": {
@@ -31,26 +31,26 @@
   "dependencies": {},
   "devDependencies": {
     "assert": "^1.4.1",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-istanbul": "^4.1.5",
-    "babel-preset-env": "^1.6.1",
-    "chai": "^4.1.2",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-istanbul": "^4.1.6",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.2.0",
     "chai-spies": "^1.0.0",
-    "coveralls": "^3.0.0",
-    "cross-env": "^5.1.3",
-    "eslint": "^4.16.0",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-loader": "^1.9.0",
-    "eslint-plugin-import": "^2.8.0",
-    "karma": "^2.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "karma": "^2.0.5",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-jasmine": "^1.1.1",
+    "karma-jasmine": "^1.1.2",
     "karma-mocha": "^1.3.0",
-    "mocha": "^5.0.0",
+    "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^11.4.1",
-    "webpack": "^3.10.0"
+    "nyc": "^11.9.0",
+    "webpack": "^3.12.0"
   },
   "nyc": {
     "reporter": [
@@ -59,8 +59,12 @@
       "lcov",
       "html"
     ],
-    "include": ["src/**/*.js"],
-    "require": ["babel-register"],
+    "include": [
+      "src/**/*.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
     "sourceMap": false,
     "instrument": true
   }

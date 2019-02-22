@@ -80,9 +80,14 @@ class PollUntil {
     }
   }
   _failedToWait() {
-    const waitError = new Error(`${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`);
-    this._log(waitError);
-    return waitError;
+    const waitErrorText = `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    if (this._lastError) {
+      this._lastError.message += `${this._lastError.message}\n${waitErrorText}`;
+    } else {
+      this._lastError = new Error(waitErrorText);
+    }
+    this._log(this._lastError);
+    return this._lastError;
   }
   _runFunction() {
     if (this._shouldStopTrying()) {
@@ -112,6 +117,7 @@ class PollUntil {
           this._log(`stopped on failure with err: ${err}`);
           return this.reject(err);
         }
+        this._lastError = err;
         this._log(`catch with err: ${err}`);
         return this._executeAgain();
       });

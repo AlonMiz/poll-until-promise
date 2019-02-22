@@ -1,6 +1,8 @@
 const chai = require('chai');
+
 const expect = chai.expect;
 const spies = require('chai-spies');
+
 chai.use(spies);
 
 const PollUntil = require('../src/poll-until-promise');
@@ -12,20 +14,18 @@ describe('Unit: Wait Until Factory', () => {
   let shouldHaltPromiseResolve;
   let shouldRejectAfterHalt;
 
-  const someRandPromise = (timeout = promiseTimeout) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
-          resolve(false);
-          tryingAttemptsRemaining -= 1;
-        } else if (shouldRejectAfterHalt) {
-          reject(new Error('rejected'));
-        } else {
-          resolve(true);
-        }
-      }, timeout);
-    });
-  };
+  const someRandPromise = (timeout = promiseTimeout) => new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldHaltPromiseResolve && tryingAttemptsRemaining > 0) {
+        resolve(false);
+        tryingAttemptsRemaining -= 1;
+      } else if (shouldRejectAfterHalt) {
+        reject(new Error('rejected'));
+      } else {
+        resolve(true);
+      }
+    }, timeout);
+  });
 
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('Unit: Wait Until Factory', () => {
     shouldRejectAfterHalt = false;
     options = {
       interval: 30,
-      timeout: 100
+      timeout: 100,
     };
   });
 
@@ -180,13 +180,15 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
     shouldRejectAfterHalt = true;
-
+    const errorContent = 'error abcdefg';
+    const specificFailedError = new Error(errorContent);
     pollUntil
       .tryEvery(1)
       .stopAfter(5)
-      .execute(() => Promise.reject())
+      .execute(() => Promise.reject(specificFailedError))
       .catch((error) => {
         expect(error.message).to.contain('Failed to wait');
+        expect(error.message).to.contain(errorContent);
         done();
       });
   });
