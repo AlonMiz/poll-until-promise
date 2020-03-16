@@ -1,3 +1,9 @@
+const ERRORS = {
+  NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
+  FAILED_TO_WAIT: 'Failed to wait',
+};
+
+
 class PollUntil {
   constructor(options = {}) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
@@ -10,21 +16,18 @@ class PollUntil {
     this._isResolved = false;
     this._verbose = options.verbose;
     this._Console = console;
-
-    this.ERRORS = {
-      NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
-      FAILED_TO_WAIT: 'Failed to wait',
-    };
   }
 
   tryEvery(interval) {
     this._interval = interval;
     return this;
   }
+
   stopAfter(timeout) {
     this._timeout = timeout;
     return this;
   }
+
   execute(executeFn) {
     this._executeFn = executeFn;
 
@@ -39,15 +42,19 @@ class PollUntil {
 
     return this.promise;
   }
+
   getPromise() {
     return this.promise;
   }
+
   isResolved() {
     return this._isResolved;
   }
+
   isWaiting() {
     return this._isWaiting;
   }
+
   stopOnFailure(stop) {
     this._stopOnFailure = stop;
     return this;
@@ -60,17 +67,21 @@ class PollUntil {
       this.reject = reject;
     });
   }
+
   _validateExecution() {
     if (typeof this._executeFn !== 'function') {
-      throw new Error(this.ERRORS.NOT_FUNCTION);
+      throw new Error(ERRORS.NOT_FUNCTION);
     }
   }
+
   _timeFromStart() {
     return Date.now() - this.start;
   }
+
   _shouldStopTrying() {
     return this._timeFromStart() > this._timeout;
   }
+
   _executeAgain() {
     this._log('executing again');
     if (typeof this._setTimeoutModule === 'function') {
@@ -79,8 +90,9 @@ class PollUntil {
       setTimeout(this._runFunction.bind(this), this._interval);
     }
   }
+
   _failedToWait() {
-    const waitErrorText = `${this.ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    const waitErrorText = `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
     if (this._lastError) {
       this._lastError.message += `${this._lastError.message}\n${waitErrorText}`;
     } else {
@@ -89,6 +101,7 @@ class PollUntil {
     this._log(this._lastError);
     return this._lastError;
   }
+
   _runFunction() {
     if (this._shouldStopTrying()) {
       this._isWaiting = false;
@@ -98,7 +111,7 @@ class PollUntil {
 
     let executor = this._executeFn();
     if (typeof executor !== 'object' || typeof executor.then !== 'function') {
-      executor = new this._PromiseModule(resolve => resolve(executor));
+      executor = new this._PromiseModule((resolve) => resolve(executor));
     }
     executor
       .then((result) => {
@@ -128,4 +141,7 @@ class PollUntil {
   }
 }
 
-module.exports = PollUntil;
+module.exports = {
+  PollUntil,
+  waitFor: (callback, options) => new PollUntil(options).execute(callback),
+};

@@ -1,11 +1,4 @@
-const chai = require('chai');
-
-const expect = chai.expect;
-const spies = require('chai-spies');
-
-chai.use(spies);
-
-const PollUntil = require('../src/poll-until-promise');
+const { PollUntil, waitFor } = require('../src/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   let options;
@@ -41,14 +34,14 @@ describe('Unit: Wait Until Factory', () => {
 
   it('should create the default wait params', () => {
     const pollUntil = new PollUntil();
-    expect(pollUntil._interval).to.equal(100);
-    expect(pollUntil._timeout).to.equal(1000);
+    expect(pollUntil._interval).toEqual(100);
+    expect(pollUntil._timeout).toEqual(1000);
   });
 
   it('should apply options with pre defined option object', () => {
     const pollUntil = new PollUntil(options);
-    expect(pollUntil._interval).to.equal(options.interval);
-    expect(pollUntil._timeout).to.equal(options.timeout);
+    expect(pollUntil._interval).toEqual(options.interval);
+    expect(pollUntil._timeout).toEqual(options.timeout);
   });
 
   it('should apply options by functional insert', () => {
@@ -56,20 +49,20 @@ describe('Unit: Wait Until Factory', () => {
       .tryEvery(options.interval)
       .stopAfter(options.timeout);
 
-    expect(pollUntil._interval).to.equal(options.interval);
-    expect(pollUntil._timeout).to.equal(options.timeout);
+    expect(pollUntil._interval).toEqual(options.interval);
+    expect(pollUntil._timeout).toEqual(options.timeout);
   });
 
   it('should execute runFunctions', () => {
     const pollUntil = new PollUntil();
-    chai.spy.on(pollUntil, '_runFunction');
+    jest.spyOn(pollUntil, '_runFunction');
 
     pollUntil
       .tryEvery(options.interval)
       .stopAfter(options.timeout)
       .execute(someRandPromise);
 
-    expect(pollUntil._runFunction).to.have.been.called();
+    expect(pollUntil._runFunction).toHaveBeenCalled();
   });
 
   it('should resolve the promise', (done) => {
@@ -80,7 +73,14 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .execute(someRandPromise)
       .then((value) => {
-        expect(value).to.equal(true);
+        expect(value).toEqual(true);
+        done();
+      });
+  });
+  it('should resolve the promise with waitFor', (done) => {
+    waitFor(someRandPromise, options)
+      .then((value) => {
+        expect(value).toEqual(true);
         done();
       });
   });
@@ -93,7 +93,7 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .execute(someRandPromise)
       .then((value) => {
-        expect(value).to.equal(true);
+        expect(value).toEqual(true);
         done();
       });
   });
@@ -109,7 +109,7 @@ describe('Unit: Wait Until Factory', () => {
     pollUntil
       .getPromise()
       .then((value) => {
-        expect(value).to.equal(true);
+        expect(value).toEqual(true);
         done();
       });
   });
@@ -123,7 +123,7 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .execute(someRandPromise)
       .then((value) => {
-        expect(value).to.equal(true);
+        expect(value).toEqual(true);
         done();
       });
   });
@@ -132,14 +132,14 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
     shouldHaltPromiseResolve = true;
 
-    chai.spy.on(pollUntil, '_shouldStopTrying', () => true);
+    jest.spyOn(pollUntil, '_shouldStopTrying').mockReturnValue(true);
 
     pollUntil
       .tryEvery(1)
       .stopAfter(5)
       .execute(someRandPromise)
       .catch((error) => {
-        expect(error.message).to.contain('Failed to wait');
+        expect(error.message).toContain('Failed to wait');
         done();
       });
   });
@@ -155,7 +155,7 @@ describe('Unit: Wait Until Factory', () => {
         reject(new Error('wow'));
       }))
       .catch((error) => {
-        expect(error.message).to.contain('wow');
+        expect(error.message).toContain('wow');
         done();
       });
   });
@@ -171,7 +171,7 @@ describe('Unit: Wait Until Factory', () => {
       .stopOnFailure(true)
       .execute(someRandPromise)
       .catch((error) => {
-        expect(error.message).to.contain('rejected');
+        expect(error.message).toContain('rejected');
         done();
       });
   });
@@ -187,8 +187,8 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(5)
       .execute(() => Promise.reject(specificFailedError))
       .catch((error) => {
-        expect(error.message).to.contain('Failed to wait');
-        expect(error.message).to.contain(errorContent);
+        expect(error.message).toContain('Failed to wait');
+        expect(error.message).toContain(errorContent);
         done();
       });
   });
@@ -200,8 +200,8 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(10)
       .execute(() => Promise.resolve(false))
       .catch(() => {
-        expect(pollUntil.isWaiting()).to.equal(false);
-        expect(pollUntil.isResolved()).to.equal(false);
+        expect(pollUntil.isWaiting()).toEqual(false);
+        expect(pollUntil.isResolved()).toEqual(false);
       });
 
 
@@ -210,9 +210,9 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(10)
       .execute(() => Promise.resolve(true))
       .then((value) => {
-        expect(value).to.equal(true);
-        expect(pollUntil.isWaiting()).to.equal(false);
-        expect(pollUntil.isResolved()).to.equal(true);
+        expect(value).toEqual(true);
+        expect(pollUntil.isWaiting()).toEqual(false);
+        expect(pollUntil.isResolved()).toEqual(true);
         done();
       });
   });
@@ -223,7 +223,7 @@ describe('Unit: Wait Until Factory', () => {
       pollUntil
         .execute(5);
     } catch (e) {
-      expect(e.message).to.contain('executor is not a function.');
+      expect(e.message).toContain('executor is not a function.');
       done();
     }
   });
@@ -234,7 +234,7 @@ describe('Unit: Wait Until Factory', () => {
     pollUntil
       .execute(() => 5)
       .then((value) => {
-        expect(value).to.equal(5);
+        expect(value).toEqual(5);
         done();
       });
   });
@@ -254,7 +254,7 @@ describe('Unit: Wait Until Factory', () => {
         return undefined;
       })
       .then((value) => {
-        expect(value).to.equal(5);
+        expect(value).toEqual(5);
         done();
       });
   });
@@ -270,7 +270,7 @@ describe('Unit: Wait Until Factory', () => {
       .stopAfter(options.timeout)
       .execute(someRandPromise)
       .then((value) => {
-        expect(value).to.equal(true);
+        expect(value).toEqual(true);
         done();
       });
   });
