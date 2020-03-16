@@ -1,6 +1,5 @@
-const webpack = require('webpack');
 const path = require('path');
-const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+
 const env = process.env.WEBPACK_ENV;
 
 const libraryWindowName = 'PollUntil';
@@ -9,15 +8,13 @@ const plugins = [];
 let outputFile;
 
 if (env === 'build') {
-  plugins.push(new UglifyJsPlugin({
-    minimize: true
-  }));
-  outputFile = libraryName + '.min.js';
+  outputFile = `${libraryName}.min.js`;
 } else {
-  outputFile = libraryName + '.js';
+  outputFile = `${libraryName}.js`;
 }
 
 const config = {
+  mode: 'production',
   entry: path.resolve('./index.js'),
   devtool: 'source-map',
   output: {
@@ -25,25 +22,18 @@ const config = {
     filename: outputFile,
     library: libraryWindowName,
     libraryTarget: 'umd',
-    umdNamedDefine: true
+    umdNamedDefine: true,
   },
   module: {
     rules: [{
       test: /\.js$/,
-      exclude: /(node_modules|bower_components)/,
+      exclude: /(node_modules)/,
       use: {
         loader: 'babel-loader',
-        options: {
-          presets: ['env']
-        }
-      }
-    }, {
-      test: /(\.jsx|\.js)$/,
-      loader: 'eslint-loader',
-      exclude: /node_modules/
-    }]
+      },
+    }],
   },
-  plugins
+  plugins,
 };
 
 module.exports = config;

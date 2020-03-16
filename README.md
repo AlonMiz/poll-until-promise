@@ -14,7 +14,17 @@ Execute it every x milliseconds and stop after y milliseconds.
 ## Usage
 
 ```js
-const PollUntil = require('poll-until-promise');
+const { waitFor } = require('poll-until-promise');
+
+waitFor(() => fetch('/get-data'), { interval: 100 })
+    // Tries every 100ms (from the last failure)
+    .then((value) => console.log('Yey', value))
+    .catch((err) => console.error(err));
+
+```
+
+```js
+const { PollUntil } = require('poll-until-promise');
 
 const later = Date.now() + 1 * 1000; // 1 seconds into the future
 
@@ -34,6 +44,7 @@ pollUntilPromise
     .catch((err) => console.error(err));
 
 ```
+
 
 ## Options
 ```js
