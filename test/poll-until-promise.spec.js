@@ -185,6 +185,7 @@ describe('Unit: Wait Until Factory', () => {
     pollUntil
       .tryEvery(1)
       .stopAfter(5)
+      .stopOnFailure(false)
       .execute(() => Promise.reject(specificFailedError))
       .catch((error) => {
         expect(error.message).toContain('Failed to wait');

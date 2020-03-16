@@ -5,16 +5,22 @@ const ERRORS = {
 
 
 class PollUntil {
-  constructor(options = {}) {
+  constructor({
+    Promise = global.Promise,
+    setTimeout,
+    interval = 100, timeout = 1000,
+    stopOnFailure = true,
+    verbose = false,
+  } = { }) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
-    this._PromiseModule = options.Promise || Promise;
-    this._setTimeoutModule = options.setTimeout;
-    this._interval = options.interval || 100;
-    this._timeout = options.timeout || 1000;
-    this._stopOnFailure = options.stopOnFailure || false;
+    this._PromiseModule = Promise;
+    this._setTimeoutModule = setTimeout;
+    this._interval = interval;
+    this._timeout = timeout;
+    this._stopOnFailure = stopOnFailure;
     this._isWaiting = false;
     this._isResolved = false;
-    this._verbose = options.verbose;
+    this._verbose = verbose;
     this._Console = console;
   }
 
