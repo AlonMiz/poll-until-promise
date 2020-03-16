@@ -9,7 +9,7 @@ class PollUntil {
     Promise = global.Promise,
     setTimeout,
     interval = 100, timeout = 1000,
-    stopOnFailure = true,
+    stopOnFailure = false,
     verbose = false,
   } = { }) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
