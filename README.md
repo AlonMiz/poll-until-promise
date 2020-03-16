@@ -18,8 +18,8 @@ const { waitFor } = require('poll-until-promise');
 
 waitFor(() => fetch('/get-data'), { interval: 100 })
     // Tries every 100ms (from the last failure)
-    .then((value) => console.log('Yey', value))
-    .catch((err) => console.error(err));
+    .then(value => console.log('Yey', value))
+    .catch(err => console.error(err));
 
 ```
 
@@ -35,13 +35,13 @@ pollUntilPromise
     .execute(() => {
         return new Promise((resolve, reject) => {
             if (+Date.now() >= later) {
-            return resolve(true); // Some truthy value
+                return resolve(true); // Some truthy value
             }
             reject(false);
         })
     })
-    .then((value) => console.log('Yey', value))
-    .catch((err) => console.error(err));
+    .then(value => console.log('Yey', value))
+    .catch(err => console.error(err));
 
 ```
 
