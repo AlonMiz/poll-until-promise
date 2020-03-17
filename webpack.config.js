@@ -1,17 +1,10 @@
 const path = require('path');
 
-const env = process.env.WEBPACK_ENV;
-
 const libraryWindowName = 'PollUntil';
 const libraryName = 'poll-until-promise';
 const plugins = [];
-let outputFile;
+const outputFile = `${libraryName}.js`;
 
-if (env === 'build') {
-  outputFile = `${libraryName}.min.js`;
-} else {
-  outputFile = `${libraryName}.js`;
-}
 
 const config = {
   mode: 'production',
