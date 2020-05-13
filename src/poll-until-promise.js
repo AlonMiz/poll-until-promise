@@ -121,15 +121,15 @@ class PollUntil {
     }
     executor
       .then((result) => {
-        if (result) {
-          this.resolve(result);
-          this._isWaiting = false;
-          this._isResolved = true;
-          this._log(`then done waiting with result: ${result}`);
+        if (result === false) {
+          this._log(`then execute again with result: ${result}`);
+          this._executeAgain();
           return;
         }
-        this._log(`then execute again with result: ${result}`);
-        this._executeAgain();
+        this.resolve(result);
+        this._isWaiting = false;
+        this._isResolved = true;
+        this._log(`then done waiting with result: ${result}`);
       })
       .catch((err) => {
         if (this._stopOnFailure) {
