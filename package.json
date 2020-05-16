@@ -1,6 +1,6 @@
 {
   "name": "poll-until-promise",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Try repeatedly for a promise to be resolved",
   "main": "lib/poll-until-promise.js",
   "directories": {
@@ -23,10 +23,16 @@
     "test:coverage": "cross-env jest --coverage && cat ./coverage/lcov.info | coveralls",
     "release": "npm run lint && npm run test:coverage && npm run build"
   },
+  "contributors": [{
+    "name" : "Eden Turgeman",
+    "email" : "edmx0.et@gmail.com",
+    "url" : "https://github.com/EdenTurgeman"
+  }],
   "keywords": [
     "wait",
     "until",
-    "promise"
+    "promise",
+    "test"
   ],
   "author": "Alon Mizrahi",
   "license": "ISC",

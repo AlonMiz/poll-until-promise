@@ -252,7 +252,7 @@ describe('Unit: Wait Until Factory', () => {
           return 5;
         }
         counter += 1;
-        return undefined;
+        return false;
       })
       .then((value) => {
         expect(value).toEqual(5);
