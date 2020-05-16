@@ -13,6 +13,8 @@ Execute it every x milliseconds and stop after y milliseconds.
 
 ## Usage
 
+
+### Fetching data
 ```js
 const { waitFor } = require('poll-until-promise');
 
@@ -23,6 +25,22 @@ waitFor(() => fetch('/get-data'), { interval: 100 })
 
 ```
 
+### Waiting for something to be successful
+```js
+const { waitFor } = require('poll-until-promise');
+
+waitFor(() => {
+  if (Math.random() >= 0.5) {
+    throw new Error('try again');
+  } else {
+    console.log('all good')
+  }
+})
+  .then(() => console.log('Yey'))
+  .catch(err => console.error(err));
+```
+
+### Using the class
 ```js
 const { PollUntil } = require('poll-until-promise');
 
@@ -53,10 +71,6 @@ const options = {
     timeout: 1000,
     stopOnFailure: false, // Ignores promise rejections
     verbose: false,
-
-    // External Modules - e.g angularJs compatible
-    setTimeout: $timeout,
-    Promise: $q
 };
 let pollUntilPromise = new PollUntil(options);
 ```
