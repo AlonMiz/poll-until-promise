@@ -14,6 +14,7 @@ const config = {
     path: path.resolve('./lib'),
     filename: outputFile,
     library: libraryWindowName,
+    globalObject: 'this',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },

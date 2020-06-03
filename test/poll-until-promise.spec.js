@@ -1,4 +1,4 @@
-const { PollUntil, waitFor } = require('../src/poll-until-promise');
+const { PollUntil, waitFor } = require('../lib/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   let options;
