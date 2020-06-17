@@ -285,7 +285,7 @@ describe('Unit: Wait Until Factory', () => {
         }, options)
       }, options)
     } catch (e) {
-      expect(e.message).toMatch(/some error message\nFailed to wait after \d+ms\nFailed to wait after \d+ms/);
+      expect(e.message).toMatch(/^some error message\nFailed to wait after \d+ms\nFailed to wait after \d+ms$/);
     }
   });
 });
