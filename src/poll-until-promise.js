@@ -100,7 +100,7 @@ class PollUntil {
   _failedToWait() {
     const waitErrorText = `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
     if (this._lastError) {
-      this._lastError.message += `${this._lastError.message}\n${waitErrorText}`;
+      this._lastError.message += `\n${waitErrorText}`;
     } else {
       this._lastError = new Error(waitErrorText);
     }

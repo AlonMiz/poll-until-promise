@@ -1,4 +1,4 @@
-const { PollUntil, waitFor } = require('../lib/poll-until-promise');
+const { PollUntil, waitFor } = require('../src/poll-until-promise');
 
 describe('Unit: Wait Until Factory', () => {
   let options;
@@ -184,12 +184,13 @@ describe('Unit: Wait Until Factory', () => {
     const specificFailedError = new Error(errorContent);
     pollUntil
       .tryEvery(1)
-      .stopAfter(5)
+      .stopAfter(3000)
       .stopOnFailure(false)
       .execute(() => Promise.reject(specificFailedError))
       .catch((error) => {
         expect(error.message).toContain('Failed to wait');
         expect(error.message).toContain(errorContent);
+        console.log(error.message)
         done();
       });
   });
@@ -274,5 +275,17 @@ describe('Unit: Wait Until Factory', () => {
         expect(value).toEqual(true);
         done();
       });
+  });
+
+  it('wait for within wait for should throw a single error', async () => {
+    try {
+      await waitFor(() => {
+        return waitFor(async () => {
+          throw new Error('some error message');
+        }, options)
+      }, options)
+    } catch (e) {
+      expect(e.message).toMatch(/some error message\nFailed to wait after \d+ms\nFailed to wait after \d+ms/);
+    }
   });
 });
