@@ -1,6 +1,6 @@
 {
   "name": "poll-until-promise",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Try repeatedly for a promise to be resolved",
   "main": "lib/poll-until-promise.js",
   "directories": {
