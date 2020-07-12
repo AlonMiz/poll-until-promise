@@ -6,13 +6,13 @@ const ERRORS = {
 
 class PollUntil {
   constructor({
-                Promise = global.Promise,
-                setTimeout,
-                interval = 100, timeout = 1000,
-                stopOnFailure = false,
-                verbose = false,
-                message,
-              } = {}) {
+    Promise = global.Promise,
+    setTimeout,
+    interval = 100, timeout = 1000,
+    stopOnFailure = false,
+    verbose = false,
+    message,
+  } = {}) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
     this._PromiseModule = Promise;
     this._setTimeoutModule = setTimeout;
