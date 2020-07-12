@@ -190,7 +190,6 @@ describe('Unit: Wait Until Factory', () => {
       .catch((error) => {
         expect(error.message).toContain('Failed to wait');
         expect(error.message).toContain(errorContent);
-        console.log(error.message)
         done();
       });
   });
@@ -297,7 +296,6 @@ describe('Unit: Wait Until Factory', () => {
         }, options2)
       }, options1)
     } catch (e) {
-      console.error(e)
       expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
       expect(e.stack).toMatch(/alon/);
     }
@@ -310,7 +308,6 @@ describe('Unit: Wait Until Factory', () => {
         throw new Error('some error message');
       }, options)
     } catch (e) {
-      console.error(e)
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
     }
   });
@@ -325,7 +322,6 @@ describe('Unit: Wait Until Factory', () => {
       }
       await customFunction()
     } catch (e) {
-      console.error(e)
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
       expect(e.stack).toMatch(/customFunction/);
     }
