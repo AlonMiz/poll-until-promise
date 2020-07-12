@@ -2,6 +2,7 @@ node_modules
 .git
 .history
 .vscode
+.idea
 
 # Coverage
 coverage
