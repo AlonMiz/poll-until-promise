@@ -6,12 +6,13 @@ const ERRORS = {
 
 class PollUntil {
   constructor({
-    Promise = global.Promise,
-    setTimeout,
-    interval = 100, timeout = 1000,
-    stopOnFailure = false,
-    verbose = false,
-  } = { }) {
+                Promise = global.Promise,
+                setTimeout,
+                interval = 100, timeout = 1000,
+                stopOnFailure = false,
+                verbose = false,
+                message,
+              } = {}) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
     this._PromiseModule = Promise;
     this._setTimeoutModule = setTimeout;
@@ -21,6 +22,8 @@ class PollUntil {
     this._isWaiting = false;
     this._isResolved = false;
     this._verbose = verbose;
+    this._userMessage = message;
+    this.originalStacktraceError = new Error();
     this._Console = console;
   }
 
@@ -98,11 +101,13 @@ class PollUntil {
   }
 
   _failedToWait() {
-    const waitErrorText = `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    let waitErrorText = `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    if (this._userMessage) waitErrorText = `${waitErrorText}: ${this._userMessage}`;
     if (this._lastError) {
-      this._lastError.message += `\n${waitErrorText}`;
+      this._lastError.message = `${waitErrorText}\n${this._lastError.message}`;
     } else {
-      this._lastError = new Error(waitErrorText);
+      this._lastError = this.originalStacktraceError;
+      this._lastError.message = waitErrorText;
     }
     this._log(this._lastError);
     return this._lastError;

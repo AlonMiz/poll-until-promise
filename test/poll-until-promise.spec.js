@@ -278,14 +278,56 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('wait for within wait for should throw a single error', async () => {
+    const options1 = {
+      ...options,
+      message: 'waiting for something'
+    }
+    const options2 = {
+      ...options,
+      message: 'waiting for another thing'
+    }
     try {
       await waitFor(() => {
         return waitFor(async () => {
-          throw new Error('some error message');
-        }, options)
+          function alon() {
+            throw new Error('some error message');
+          }
+
+          alon()
+        }, options2)
+      }, options1)
+    } catch (e) {
+      console.error(e)
+      expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
+      expect(e.stack).toMatch(/alon/);
+    }
+  });
+
+  it('wait for should show the user message on failure', async () => {
+    options.message = 'waiting for something'
+    try {
+      await waitFor(async () => {
+        throw new Error('some error message');
       }, options)
     } catch (e) {
-      expect(e.message).toMatch(/^some error message\nFailed to wait after \d+ms\nFailed to wait after \d+ms$/);
+      console.error(e)
+      expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
+    }
+  });
+
+  it('wait for should save the original stacktrace', async () => {
+    options.message = 'waiting for something'
+    try {
+      async function customFunction() {
+        await waitFor(() => {
+          return false
+        }, options)
+      }
+      await customFunction()
+    } catch (e) {
+      console.error(e)
+      expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
+      expect(e.stack).toMatch(/customFunction/);
     }
   });
 });

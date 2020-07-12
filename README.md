@@ -44,7 +44,7 @@ waitFor(() => {
 ```js
 const { PollUntil } = require('poll-until-promise');
 
-const later = Date.now() + 1 * 1000; // 1 seconds into the future
+const later = Date.now() + 1000; // 1 seconds into the future
 
 let pollUntilPromise = new PollUntil();
 pollUntilPromise
@@ -71,6 +71,7 @@ const options = {
     timeout: 1000,
     stopOnFailure: false, // Ignores promise rejections
     verbose: false,
+    message: 'Waiting for time to pass :)', // custom message to display on failure 
 };
 let pollUntilPromise = new PollUntil(options);
 ```
@@ -97,7 +98,7 @@ pollUntilPromise.getPromise().then(() => console.log('OMG'))
 
 ```js
 const PollUntil = require('poll-until-promise');
-const later = Date.now() + 1 * 1000; // 1 seconds into the future
+const later = Date.now() + 1000; // 1 seconds into the future
 
 let pollUntilPromise = new PollUntil();
 pollUntilPromise
