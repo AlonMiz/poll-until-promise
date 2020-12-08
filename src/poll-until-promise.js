@@ -8,7 +8,8 @@ class PollUntil {
   constructor({
     Promise = global.Promise,
     setTimeout,
-    interval = 100, timeout = 1000,
+    interval = 100,
+    timeout = 1000,
     stopOnFailure = false,
     verbose = false,
     message,
@@ -105,6 +106,8 @@ class PollUntil {
     if (this._userMessage) waitErrorText = `${waitErrorText}: ${this._userMessage}`;
     if (this._lastError) {
       this._lastError.message = `${waitErrorText}\n${this._lastError.message}`;
+      const originalStack = this.originalStacktraceError.stack;
+      this._lastError.stack += originalStack.substring(originalStack.indexOf('\n') + 1);
     } else {
       this._lastError = this.originalStacktraceError;
       this._lastError.message = waitErrorText;

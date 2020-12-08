@@ -301,7 +301,7 @@ describe('Unit: Wait Until Factory', () => {
     }
   });
 
-  it('wait for should show the user message on failure', async () => {
+  it('wait for should show the user message on failure', async (done) => {
     options.message = 'waiting for something'
     try {
       await waitFor(async () => {
@@ -309,10 +309,11 @@ describe('Unit: Wait Until Factory', () => {
       }, options)
     } catch (e) {
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
+      done()
     }
   });
 
-  it('wait for should save the original stacktrace', async () => {
+  it('wait for should save the original stacktrace', async (done) => {
     options.message = 'waiting for something'
     try {
       async function customFunction() {
@@ -324,6 +325,34 @@ describe('Unit: Wait Until Factory', () => {
     } catch (e) {
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
       expect(e.stack).toMatch(/customFunction/);
+      done()
+    }
+  });
+
+  it('should show stack if thrown inside a function', async (done) => {
+    let counter = 100
+    try {
+      function functionA() {
+        return waitFor(async () => {
+          if (counter !== 0) {
+            counter -= 1;
+            throw new Error('try again');
+          } else {
+            console.log('all good')
+          }
+        }, { timeout: 20, interval: 2, verbose: true })
+      }
+
+      async function functionB() {
+        await functionA()
+      }
+
+      await functionB()
+    } catch (e) {
+      expect(e.message).toMatch(/try again/);
+      expect(e.stack).toMatch(/functionA/);
+      expect(e.stack).toMatch(/functionB/);
+      done()
     }
   });
 });
