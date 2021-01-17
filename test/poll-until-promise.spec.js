@@ -355,4 +355,21 @@ describe('Unit: Wait Until Factory', () => {
       done()
     }
   });
+
+  it('should backoff if factor defined', async (done) => {
+    const baseInterval = 100;
+    const backoffFactor = 2;
+
+    const pollUntil = new PollUntil({ backoffFactor });
+
+    pollUntil
+        .tryEvery(baseInterval)
+        .stopAfter((baseInterval*backoffFactor)-baseInterval*Math.random())
+        .execute(someRandPromise)
+        .then((value) => {
+          expect(value).toEqual(true);
+          done();
+        });
+    expect(someRandPromise).toHaveBeenCalledTimes(1);
+  });
 });
