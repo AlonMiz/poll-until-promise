@@ -96,7 +96,7 @@ class PollUntil {
 
   _executeAgain() {
     this._log('executing again');
-    this._interval = this._interval * this._backoffFactor;
+    this._interval *= this._backoffFactor;
     if (typeof this._setTimeoutModule === 'function') {
       this._setTimeoutModule(this._runFunction.bind(this), this._interval);
     } else {
