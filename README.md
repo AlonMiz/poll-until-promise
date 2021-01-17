@@ -68,6 +68,7 @@ pollUntilPromise
 ```js
 const options = {
     interval: 100,
+    backoffFactor: 1, // Exponential interval increase. Defaults to 1, which means no backoff
     timeout: 1000,
     stopOnFailure: false, // Ignores promise rejections
     verbose: false,
