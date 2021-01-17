@@ -12,6 +12,7 @@ class PollUntil {
     timeout = 1000,
     stopOnFailure = false,
     verbose = false,
+    backoffFactor = 1,
     message,
   } = {}) {
     // Used for angularJs internal functions, eg. $interval, $q, $timeout
@@ -26,6 +27,7 @@ class PollUntil {
     this._userMessage = message;
     this.originalStacktraceError = new Error();
     this._Console = console;
+    this._backoffFactor = backoffFactor;
   }
 
   tryEvery(interval) {
@@ -94,6 +96,7 @@ class PollUntil {
 
   _executeAgain() {
     this._log('executing again');
+    this._interval *= this._backoffFactor;
     if (typeof this._setTimeoutModule === 'function') {
       this._setTimeoutModule(this._runFunction.bind(this), this._interval);
     } else {
