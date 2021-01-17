@@ -279,22 +279,20 @@ describe('Unit: Wait Until Factory', () => {
   it('wait for within wait for should throw a single error', async () => {
     const options1 = {
       ...options,
-      message: 'waiting for something'
-    }
+      message: 'waiting for something',
+    };
     const options2 = {
       ...options,
-      message: 'waiting for another thing'
-    }
+      message: 'waiting for another thing',
+    };
     try {
-      await waitFor(() => {
-        return waitFor(async () => {
-          function alon() {
-            throw new Error('some error message');
-          }
+      await waitFor(() => waitFor(async () => {
+        function alon() {
+          throw new Error('some error message');
+        }
 
-          alon()
-        }, options2)
-      }, options1)
+        alon();
+      }, options2), options1);
     } catch (e) {
       expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
       expect(e.stack).toMatch(/alon/);
@@ -302,35 +300,33 @@ describe('Unit: Wait Until Factory', () => {
   });
 
   it('wait for should show the user message on failure', async (done) => {
-    options.message = 'waiting for something'
+    options.message = 'waiting for something';
     try {
       await waitFor(async () => {
         throw new Error('some error message');
-      }, options)
+      }, options);
     } catch (e) {
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
-      done()
+      done();
     }
   });
 
   it('wait for should save the original stacktrace', async (done) => {
-    options.message = 'waiting for something'
+    options.message = 'waiting for something';
     try {
       async function customFunction() {
-        await waitFor(() => {
-          return false
-        }, options)
+        await waitFor(() => false, options);
       }
-      await customFunction()
+      await customFunction();
     } catch (e) {
       expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
       expect(e.stack).toMatch(/customFunction/);
-      done()
+      done();
     }
   });
 
   it('should show stack if thrown inside a function', async (done) => {
-    let counter = 100
+    let counter = 100;
     try {
       function functionA() {
         return waitFor(async () => {
@@ -338,21 +334,21 @@ describe('Unit: Wait Until Factory', () => {
             counter -= 1;
             throw new Error('try again');
           } else {
-            console.log('all good')
+            console.log('all good');
           }
-        }, { timeout: 20, interval: 2, verbose: true })
+        }, { timeout: 20, interval: 2, verbose: true });
       }
 
       async function functionB() {
-        await functionA()
+        await functionA();
       }
 
-      await functionB()
+      await functionB();
     } catch (e) {
       expect(e.message).toMatch(/try again/);
       expect(e.stack).toMatch(/functionA/);
       expect(e.stack).toMatch(/functionB/);
-      done()
+      done();
     }
   });
 
@@ -360,16 +356,19 @@ describe('Unit: Wait Until Factory', () => {
     const baseInterval = 100;
     const backoffFactor = 2;
 
+    shouldHaltPromiseResolve = true;
+    tryingAttemptsRemaining = 1;
+
     const pollUntil = new PollUntil({ backoffFactor });
 
+    const mockPromise = jest.fn(() => someRandPromise(0));
+
     pollUntil
-        .tryEvery(baseInterval)
-        .stopAfter((baseInterval*backoffFactor)-baseInterval*Math.random())
-        .execute(someRandPromise)
-        .then((value) => {
-          expect(value).toEqual(true);
-          done();
-        });
-    expect(someRandPromise).toHaveBeenCalledTimes(1);
+      .tryEvery(baseInterval)
+      .execute(mockPromise)
+      .then(() => {
+        expect(pollUntil._interval).toEqual(baseInterval * backoffFactor);
+        done();
+      });
   });
 });
