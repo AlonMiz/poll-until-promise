@@ -40,11 +40,21 @@ class PollUntil {
     return this;
   }
 
-  execute(executeFn) {
-    this._executeFn = executeFn;
+  promisify(fn) {
+    return async () => {
+      try {
+        const result = await fn();
+        return result;
+      } catch (e) {
+        throw e;
+      }
+    };
+  };
 
+  execute(executeFn) {
     this._applyPromiseHandlers();
-    this._validateExecution();
+    this._validateExecution(executeFn);
+    this._executeFn = this.promisify(executeFn);
 
     this.start = Date.now();
     this._isWaiting = true;
@@ -80,8 +90,8 @@ class PollUntil {
     });
   }
 
-  _validateExecution() {
-    if (typeof this._executeFn !== 'function') {
+  _validateExecution(executeFn) {
+    if (typeof executeFn !== 'function') {
       throw new Error(ERRORS.NOT_FUNCTION);
     }
   }
