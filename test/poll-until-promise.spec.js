@@ -371,4 +371,18 @@ describe('Unit: Wait Until Factory', () => {
         done();
       });
   });
+
+  it('wait for should retry in sync function that throws errors', async (done) => {
+    let counter = 0;
+
+    try {
+      await waitFor(() => {
+        counter += 1;
+        throw new Error('some error message');
+      }, options);
+    } catch (e) {
+      expect(counter).toBeGreaterThan(1);
+      done();
+    }
+  });
 });
