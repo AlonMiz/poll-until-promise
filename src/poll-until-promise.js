@@ -136,11 +136,7 @@ class PollUntil {
       return;
     }
 
-    let executor = this._executeFn();
-    if (typeof executor !== 'object' || typeof executor.then !== 'function') {
-      executor = new this._PromiseModule((resolve) => resolve(executor));
-    }
-    executor
+    this._executeFn()
       .then((result) => {
         if (result === false) {
           this._log(`then execute again with result: ${result}`);
