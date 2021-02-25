@@ -372,14 +372,16 @@ describe('Unit: Wait Until Factory', () => {
       });
   });
 
-  it('wait for should should retry in sync function', async (done) => {
+  it('wait for should retry in sync function that throws errors', async (done) => {
+    let counter = 0;
+
     try {
       await waitFor(() => {
+        counter += 1;
         throw new Error('some error message');
       }, options);
     } catch (e) {
-      console.log(e)
-      expect(e.message).toMatch(/^Failed to wait after \d+ms\nsome error message$/);
+      expect(counter).toBeGreaterThan(1);
       done();
     }
   });
