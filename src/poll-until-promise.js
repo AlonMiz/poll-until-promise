@@ -3,6 +3,18 @@ const ERRORS = {
   FAILED_TO_WAIT: 'Failed to wait',
 };
 
+function promisify(fn) {
+  return async () => {
+    const result = await fn();
+    return result;
+  };
+}
+
+function validateExecution(executeFn) {
+  if (typeof executeFn !== 'function') {
+    throw new Error(ERRORS.NOT_FUNCTION);
+  }
+}
 
 class PollUntil {
   constructor({
@@ -40,21 +52,11 @@ class PollUntil {
     return this;
   }
 
-  promisify(fn) {
-    return async () => {
-      try {
-        const result = await fn();
-        return result;
-      } catch (e) {
-        throw e;
-      }
-    };
-  };
 
   execute(executeFn) {
     this._applyPromiseHandlers();
-    this._validateExecution(executeFn);
-    this._executeFn = this.promisify(executeFn);
+    validateExecution(executeFn);
+    this._executeFn = promisify(executeFn);
 
     this.start = Date.now();
     this._isWaiting = true;
@@ -90,11 +92,6 @@ class PollUntil {
     });
   }
 
-  _validateExecution(executeFn) {
-    if (typeof executeFn !== 'function') {
-      throw new Error(ERRORS.NOT_FUNCTION);
-    }
-  }
 
   _timeFromStart() {
     return Date.now() - this.start;
