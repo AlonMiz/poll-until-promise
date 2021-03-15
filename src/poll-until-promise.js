@@ -21,7 +21,7 @@ class PollUntil {
     Promise = global.Promise,
     setTimeout,
     interval = 100,
-    timeout = 1000,
+    timeout = 10000,
     stopOnFailure = false,
     verbose = false,
     backoffFactor = 1,
