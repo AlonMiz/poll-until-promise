@@ -18,7 +18,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "jest",
     "test:coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
@@ -53,7 +53,6 @@
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "coveralls": "^3.1.1",
-    "cross-env": "^7.0.3",
     "eslint": "^8.5.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^16.1.0",
