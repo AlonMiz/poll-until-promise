@@ -1,3 +1,6 @@
 lib
 dist
 .eslintrc.js
+coverage/**
+webpack.config.js
+jest.config.js

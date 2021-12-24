@@ -1,7 +1,6 @@
 const path = require('path');
 
 const libraryWindowName = 'PollUntil';
-const libraryName = 'poll-until-promise';
 const plugins = [];
 const outputFile = `index.js`;
 
