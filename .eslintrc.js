@@ -4,7 +4,7 @@ module.exports = {
     'airbnb-typescript/base'
   ],
   parserOptions: {
-    project: './tsconfig.json'
+    project: './tsconfig.eslint.json'
   },
   "env": {
     "browser": true,

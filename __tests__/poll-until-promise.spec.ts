@@ -1,4 +1,4 @@
-import { IWaitForOptions, PollUntil, waitFor } from '../src/poll-until-promise';
+import { IWaitForOptions, PollUntil, waitFor } from '../src';
 
 describe('Unit: Wait Until Factory', () => {
   let options: IWaitForOptions = {
@@ -336,8 +336,6 @@ describe('Unit: Wait Until Factory', () => {
         if (counter !== 0) {
           counter -= 1;
           throw new Error('try again');
-        } else {
-          console.log('all good');
         }
       }, { timeout: 20, interval: 2, verbose: true });
     }
