@@ -1,6 +1,6 @@
 {
   "name": "poll-until-promise",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Try repeatedly for a promise to be resolved",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,12 +20,12 @@
     "lint": "eslint .",
     "test": "cross-env NODE_ENV=test jest",
     "test:coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
     "release": "npm run lint && npm run test:coverage && npm run build",
-    "preversion" : "npm run lint",
-    "version" : "npm run lint && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "preversion": "npm run lint",
+    "version": "npm run lint && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "contributors": [
     {
