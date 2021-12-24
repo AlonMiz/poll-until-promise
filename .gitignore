@@ -3,7 +3,8 @@ node_modules
 .history
 .vscode
 .idea
-
+dist
+lib
 # Coverage
 coverage
 .coveralls.yml

@@ -3,12 +3,11 @@ const path = require('path');
 const libraryWindowName = 'PollUntil';
 const libraryName = 'poll-until-promise';
 const plugins = [];
-const outputFile = `${libraryName}.js`;
-
+const outputFile = `index.js`;
 
 const config = {
   mode: 'production',
-  entry: path.resolve('./index.js'),
+  entry: path.resolve('./src/index.ts'),
   devtool: 'source-map',
   output: {
     path: path.resolve('./lib'),
@@ -19,13 +18,16 @@ const config = {
     umdNamedDefine: true,
   },
   module: {
-    rules: [{
-      test: /\.js$/,
-      exclude: /(node_modules)/,
-      use: {
-        loader: 'babel-loader',
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
-    }],
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
   plugins,
 };

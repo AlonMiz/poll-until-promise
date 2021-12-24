@@ -1,11 +1,14 @@
-const { PollUntil, waitFor } = require('../src/poll-until-promise');
+import { IWaitForOptions, PollUntil, waitFor } from '../src/poll-until-promise';
 
 describe('Unit: Wait Until Factory', () => {
-  let options;
-  let promiseTimeout;
-  let tryingAttemptsRemaining;
-  let shouldHaltPromiseResolve;
-  let shouldRejectAfterHalt;
+  let options: IWaitForOptions = {
+    interval: 30,
+    timeout: 100,
+  };
+  let promiseTimeout = 10;
+  let tryingAttemptsRemaining = 0;
+  let shouldHaltPromiseResolve = false;
+  let shouldRejectAfterHalt = false;
 
   const someRandPromise = (timeout = promiseTimeout) => new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -19,7 +22,6 @@ describe('Unit: Wait Until Factory', () => {
       }
     }, timeout);
   });
-
 
   beforeEach(() => {
     promiseTimeout = 10;
@@ -46,8 +48,8 @@ describe('Unit: Wait Until Factory', () => {
 
   it('should apply options by functional insert', () => {
     const pollUntil = new PollUntil()
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout);
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!);
 
     expect(pollUntil._interval).toEqual(options.interval);
     expect(pollUntil._timeout).toEqual(options.timeout);
@@ -58,8 +60,8 @@ describe('Unit: Wait Until Factory', () => {
     jest.spyOn(pollUntil, '_runFunction');
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise);
 
     expect(pollUntil._runFunction).toHaveBeenCalled();
@@ -69,8 +71,8 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise)
       .then((value) => {
         expect(value).toEqual(true);
@@ -89,8 +91,8 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise)
       .then((value) => {
         expect(value).toEqual(true);
@@ -102,8 +104,8 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise);
 
     pollUntil
@@ -120,7 +122,7 @@ describe('Unit: Wait Until Factory', () => {
 
     pollUntil
       .tryEvery(1)
-      .stopAfter(options.timeout)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise)
       .then((value) => {
         expect(value).toEqual(true);
@@ -148,8 +150,8 @@ describe('Unit: Wait Until Factory', () => {
     const pollUntil = new PollUntil();
 
     pollUntil
-      .tryEvery(options.interval)
-      .stopAfter(options.timeout)
+      .tryEvery(options.interval!)
+      .stopAfter(options.timeout!)
       .stopOnFailure(true)
       .execute(() => new Promise((resolve, reject) => {
         reject(new Error('wow'));
@@ -167,7 +169,7 @@ describe('Unit: Wait Until Factory', () => {
 
     pollUntil
       .tryEvery(1)
-      .stopAfter(options.timeout)
+      .stopAfter(options.timeout!)
       .stopOnFailure(true)
       .execute(someRandPromise)
       .catch((error) => {
@@ -205,7 +207,6 @@ describe('Unit: Wait Until Factory', () => {
         expect(pollUntil.isResolved()).toEqual(false);
       });
 
-
     pollUntil
       .tryEvery(5)
       .stopAfter(10)
@@ -223,7 +224,7 @@ describe('Unit: Wait Until Factory', () => {
     try {
       pollUntil
         .execute(5);
-    } catch (e) {
+    } catch (e: Error | any) {
       expect(e.message).toContain('executor is not a function.');
       done();
     }
@@ -264,11 +265,11 @@ describe('Unit: Wait Until Factory', () => {
     shouldHaltPromiseResolve = true;
     tryingAttemptsRemaining = 2;
 
-    const pollUntil = new PollUntil({ setTimeout });
+    const pollUntil = new PollUntil({ setTimeoutFunction: setTimeout });
 
     pollUntil
       .tryEvery(1)
-      .stopAfter(options.timeout)
+      .stopAfter(options.timeout!)
       .execute(someRandPromise)
       .then((value) => {
         expect(value).toEqual(true);
@@ -293,66 +294,67 @@ describe('Unit: Wait Until Factory', () => {
 
         alon();
       }, options2), options1);
-    } catch (e) {
+    } catch (e: Error | any) {
       expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
       expect(e.stack).toMatch(/alon/);
     }
   });
 
-  it('wait for should show the user message on failure', async (done) => {
+  it('wait for should show the user message on failure', async () => {
     options.message = 'waiting for something';
+    let error: Error | any = null;
     try {
       await waitFor(async () => {
         throw new Error('some error message');
       }, options);
     } catch (e) {
-      expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
-      done();
+      error = e;
     }
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
   });
 
-  it('wait for should save the original stacktrace', async (done) => {
+  it('wait for should save the original stacktrace', async () => {
     options.message = 'waiting for something';
+    let error: Error | any = null;
+    async function customFunction() {
+      await waitFor(() => false, options);
+    }
     try {
-      async function customFunction() {
-        await waitFor(() => false, options);
-      }
       await customFunction();
     } catch (e) {
-      expect(e.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
-      expect(e.stack).toMatch(/customFunction/);
-      done();
+      error = e;
     }
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
+    expect(error?.stack).toMatch(/customFunction/);
   });
 
-  it('should show stack if thrown inside a function', async (done) => {
+  it('should show stack if thrown inside a function', async () => {
     let counter = 100;
+    let error: Error | any = null;
+    function functionA() {
+      return waitFor(async () => {
+        if (counter !== 0) {
+          counter -= 1;
+          throw new Error('try again');
+        } else {
+          console.log('all good');
+        }
+      }, { timeout: 20, interval: 2, verbose: true });
+    }
+    async function functionB() {
+      await functionA();
+    }
     try {
-      function functionA() {
-        return waitFor(async () => {
-          if (counter !== 0) {
-            counter -= 1;
-            throw new Error('try again');
-          } else {
-            console.log('all good');
-          }
-        }, { timeout: 20, interval: 2, verbose: true });
-      }
-
-      async function functionB() {
-        await functionA();
-      }
-
       await functionB();
     } catch (e) {
-      expect(e.message).toMatch(/try again/);
-      expect(e.stack).toMatch(/functionA/);
-      expect(e.stack).toMatch(/functionB/);
-      done();
+      error = e;
     }
+    expect(error?.message).toMatch(/try again/);
+    expect(error?.stack).toMatch(/functionA/);
+    expect(error?.stack).toMatch(/functionB/);
   });
 
-  it('should backoff if factor defined', async (done) => {
+  it('should backoff if factor defined', async () => {
     const baseInterval = 100;
     const backoffFactor = 2;
 
@@ -363,26 +365,26 @@ describe('Unit: Wait Until Factory', () => {
 
     const mockPromise = jest.fn(() => someRandPromise(0));
 
-    pollUntil
+    return pollUntil
       .tryEvery(baseInterval)
       .execute(mockPromise)
       .then(() => {
         expect(pollUntil._interval).toEqual(baseInterval * backoffFactor);
-        done();
       });
   });
 
-  it('wait for should retry in sync function that throws errors', async (done) => {
+  it('wait for should retry in sync function that throws errors', async () => {
     let counter = 0;
-
+    let error: Error | any = null;
     try {
       await waitFor(() => {
         counter += 1;
         throw new Error('some error message');
       }, options);
     } catch (e) {
-      expect(counter).toBeGreaterThan(1);
-      done();
+      error = e;
     }
+    expect(counter).toBeGreaterThan(1);
+    expect(error).not.toBeNull();
   });
 });

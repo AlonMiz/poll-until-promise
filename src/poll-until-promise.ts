@@ -3,33 +3,65 @@ const ERRORS = {
   FAILED_TO_WAIT: 'Failed to wait',
 };
 
-function promisify(fn) {
+function promisify(fn: any) {
   return async () => {
     const result = await fn();
     return result;
   };
 }
 
-function validateExecution(executeFn) {
+export type IExecuteFunction = any;
+
+function validateExecution(executeFn: IExecuteFunction) {
   if (typeof executeFn !== 'function') {
     throw new Error(ERRORS.NOT_FUNCTION);
   }
 }
 
-class PollUntil {
+export interface IWaitForOptions {
+  PromiseModule?: PromiseConstructor
+  setTimeoutFunction?: any
+  interval?: number
+  timeout?: number
+  stopOnFailure?: boolean
+  verbose?: boolean
+  backoffFactor?: number
+  message?: string
+
+}
+
+export class PollUntil {
+  private readonly _PromiseModule: PromiseConstructor;
+  private readonly _setTimeoutFunction: any;
+  _interval: number;
+  _timeout: number;
+  private _stopOnFailure: boolean;
+  private readonly _backoffFactor: number;
+  private readonly _Console: Console;
+  private readonly originalStacktraceError: Error;
+  private readonly _userMessage: string;
+  private readonly _verbose: boolean;
+  private _isWaiting: boolean;
+  private _isResolved: boolean;
+  private _executeFn: IExecuteFunction;
+  private start: number;
+  private promise: Promise<any> | undefined;
+  private resolve: ((value: any) => void) | undefined;
+  private reject: ((reason?: any) => void) | undefined;
+  private _lastError: Error | undefined;
+
   constructor({
-    Promise = global.Promise,
-    setTimeout,
+    PromiseModule = global.Promise,
+    setTimeoutFunction,
     interval = 100,
     timeout = 1000,
     stopOnFailure = false,
     verbose = false,
     backoffFactor = 1,
-    message,
-  } = {}) {
-    // Used for angularJs internal functions, eg. $interval, $q, $timeout
-    this._PromiseModule = Promise;
-    this._setTimeoutModule = setTimeout;
+    message = '',
+  }:IWaitForOptions = {}) {
+    this._PromiseModule = PromiseModule;
+    this._setTimeoutFunction = setTimeoutFunction;
     this._interval = interval;
     this._timeout = timeout;
     this._stopOnFailure = stopOnFailure;
@@ -40,20 +72,20 @@ class PollUntil {
     this.originalStacktraceError = new Error();
     this._Console = console;
     this._backoffFactor = backoffFactor;
+    this.start = +Date.now();
   }
 
-  tryEvery(interval) {
+  tryEvery(interval: number): PollUntil {
     this._interval = interval;
     return this;
   }
 
-  stopAfter(timeout) {
+  stopAfter(timeout: number): PollUntil {
     this._timeout = timeout;
     return this;
   }
 
-
-  execute(executeFn) {
+  execute(executeFn: IExecuteFunction): Promise<any> {
     this._applyPromiseHandlers();
     validateExecution(executeFn);
     this._executeFn = promisify(executeFn);
@@ -64,11 +96,11 @@ class PollUntil {
     this._log('starting to execute');
     this._runFunction();
 
-    return this.promise;
+    return this.promise!;
   }
 
-  getPromise() {
-    return this.promise;
+  getPromise(): Promise<any> {
+    return this.promise!;
   }
 
   isResolved() {
@@ -79,11 +111,10 @@ class PollUntil {
     return this._isWaiting;
   }
 
-  stopOnFailure(stop) {
+  stopOnFailure(stop: boolean): PollUntil {
     this._stopOnFailure = stop;
     return this;
   }
-
 
   _applyPromiseHandlers() {
     this.promise = new this._PromiseModule((resolve, reject) => {
@@ -91,7 +122,6 @@ class PollUntil {
       this.reject = reject;
     });
   }
-
 
   _timeFromStart() {
     return Date.now() - this.start;
@@ -104,8 +134,8 @@ class PollUntil {
   _executeAgain() {
     this._log('executing again');
     this._interval *= this._backoffFactor;
-    if (typeof this._setTimeoutModule === 'function') {
-      this._setTimeoutModule(this._runFunction.bind(this), this._interval);
+    if (typeof this._setTimeoutFunction === 'function') {
+      this._setTimeoutFunction(this._runFunction.bind(this), this._interval);
     } else {
       setTimeout(this._runFunction.bind(this), this._interval);
     }
@@ -117,7 +147,9 @@ class PollUntil {
     if (this._lastError) {
       this._lastError.message = `${waitErrorText}\n${this._lastError.message}`;
       const originalStack = this.originalStacktraceError.stack;
-      this._lastError.stack += originalStack.substring(originalStack.indexOf('\n') + 1);
+      if (originalStack) {
+        this._lastError.stack += originalStack.substring(originalStack.indexOf('\n') + 1);
+      }
     } else {
       this._lastError = this.originalStacktraceError;
       this._lastError.message = waitErrorText;
@@ -129,26 +161,26 @@ class PollUntil {
   _runFunction() {
     if (this._shouldStopTrying()) {
       this._isWaiting = false;
-      this.reject(this._failedToWait());
+      this.reject?.(this._failedToWait());
       return;
     }
 
     this._executeFn()
-      .then((result) => {
+      .then((result: any) => {
         if (result === false) {
           this._log(`then execute again with result: ${result}`);
           this._executeAgain();
           return;
         }
-        this.resolve(result);
+        this.resolve?.(result);
         this._isWaiting = false;
         this._isResolved = true;
         this._log(`then done waiting with result: ${result}`);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         if (this._stopOnFailure) {
           this._log(`stopped on failure with err: ${err}`);
-          return this.reject(err);
+          return this.reject?.(err);
         }
         this._lastError = err;
         this._log(`catch with err: ${err}`);
@@ -156,12 +188,9 @@ class PollUntil {
       });
   }
 
-  _log(message) {
+  _log(message: Error | string) {
     if (this._verbose && this._Console && this._Console.log) this._Console.log(message);
   }
 }
 
-module.exports = {
-  PollUntil,
-  waitFor: (callback, options) => new PollUntil(options).execute(callback),
-};
+export const waitFor = (waitForFunction:IExecuteFunction, options: IWaitForOptions) => new PollUntil(options).execute(waitForFunction);
