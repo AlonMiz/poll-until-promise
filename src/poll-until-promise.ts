@@ -193,4 +193,4 @@ export class PollUntil {
   }
 }
 
-export const waitFor = (waitForFunction:IExecuteFunction, options: IWaitForOptions) => new PollUntil(options).execute(waitForFunction);
+export const waitFor = (waitForFunction:IExecuteFunction, options?: IWaitForOptions) => new PollUntil(options).execute(waitForFunction);
