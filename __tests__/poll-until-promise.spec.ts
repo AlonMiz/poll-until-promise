@@ -261,22 +261,6 @@ describe('Unit: Wait Until Factory', () => {
       });
   });
 
-  it('should use an external setTimeout module', (done) => {
-    shouldHaltPromiseResolve = true;
-    tryingAttemptsRemaining = 2;
-
-    const pollUntil = new PollUntil({ setTimeoutFunction: setTimeout });
-
-    pollUntil
-      .tryEvery(1)
-      .stopAfter(options.timeout!)
-      .execute(someRandPromise)
-      .then((value) => {
-        expect(value).toEqual(true);
-        done();
-      });
-  });
-
   it('wait for within wait for should throw a single error', async () => {
     const options1 = {
       ...options,

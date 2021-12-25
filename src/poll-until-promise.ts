@@ -19,8 +19,6 @@ function validateExecution(executeFn: IExecuteFunction) {
 }
 
 export interface IWaitForOptions {
-  PromiseModule?: PromiseConstructor
-  setTimeoutFunction?: any
   interval?: number
   timeout?: number
   stopOnFailure?: boolean
@@ -31,8 +29,6 @@ export interface IWaitForOptions {
 }
 
 export class PollUntil {
-  private readonly _PromiseModule: PromiseConstructor;
-  private readonly _setTimeoutFunction: any;
   _interval: number;
   _timeout: number;
   private _stopOnFailure: boolean;
@@ -51,8 +47,6 @@ export class PollUntil {
   private _lastError: Error | undefined;
 
   constructor({
-    PromiseModule = global.Promise,
-    setTimeoutFunction,
     interval = 100,
     timeout = 1000,
     stopOnFailure = false,
@@ -60,8 +54,6 @@ export class PollUntil {
     backoffFactor = 1,
     message = '',
   }:IWaitForOptions = {}) {
-    this._PromiseModule = PromiseModule;
-    this._setTimeoutFunction = setTimeoutFunction;
     this._interval = interval;
     this._timeout = timeout;
     this._stopOnFailure = stopOnFailure;
@@ -117,7 +109,7 @@ export class PollUntil {
   }
 
   _applyPromiseHandlers() {
-    this.promise = new this._PromiseModule((resolve, reject) => {
+    this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
@@ -134,11 +126,7 @@ export class PollUntil {
   _executeAgain() {
     this._log('executing again');
     this._interval *= this._backoffFactor;
-    if (typeof this._setTimeoutFunction === 'function') {
-      this._setTimeoutFunction(this._runFunction.bind(this), this._interval);
-    } else {
-      setTimeout(this._runFunction.bind(this), this._interval);
-    }
+    setTimeout(this._runFunction.bind(this), this._interval);
   }
 
   _failedToWait() {

@@ -13,7 +13,6 @@ Execute it every x milliseconds and stop after y milliseconds.
 
 ## Usage
 
-
 ### Fetching data
 ```js
 const { waitFor } = require('poll-until-promise');
@@ -24,6 +23,39 @@ waitFor(() => fetch('/get-data'), { interval: 100 })
     .catch(err => console.error(err));
 
 ```
+
+### Using async
+```js
+import { waitFor } from 'poll-until-promise';
+
+async function waitForDomElement(cssSelector = 'div') {
+  try {
+    const element = await waitFor(() => {
+      const element = window.document.querySelector(cssSelector);
+      if (!element) throw new Error(`failed to find element: ${cssSelector}`);
+      return element;
+    }, { timeout: 60_000 });
+    
+    return element;
+  } catch (e) {
+    console.error('faled to find dom element:', e);
+    throw e;
+  }
+}
+
+async function retryFetch(path = '/get-data') {
+  try {
+    const data = await waitFor(async () => {
+      const res = await fetch(path);
+      return res.json();
+    }, { timeout: 60_000, interval: 1000 });
+  } catch (e) {
+    console.error('faled to fetch:', e);
+    throw e;
+  }
+}
+```
+
 
 ### Waiting for something to be successful
 ```js
@@ -95,7 +127,7 @@ pollUntilPromise.isWaiting()
 pollUntilPromise.getPromise().then(() => console.log('OMG'))
 ```
 
-## Another Example - Static Function
+## Static Function
 
 ```js
 const PollUntil = require('poll-until-promise');
@@ -115,9 +147,6 @@ pollUntilPromise
     .catch((err) => console.error(err));
 
 ```
-
-## Used in AngularJs
-An AngularJs compatible library based on `poll-until-promise` [angular-wait-until](https://github.com/AlonMiz/angular-wait-until).
 
 [travis-url]: https://travis-ci.org/AlonMiz/poll-until-promise
 [travis-image]: https://travis-ci.org/AlonMiz/poll-until-promise.svg?branch=master
