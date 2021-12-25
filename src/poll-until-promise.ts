@@ -19,13 +19,12 @@ function validateExecution(executeFn: IExecuteFunction) {
 }
 
 export interface IWaitForOptions {
-  interval?: number
   timeout?: number
-  stopOnFailure?: boolean
-  verbose?: boolean
-  backoffFactor?: number
+  interval?: number
   message?: string
-
+  stopOnFailure?: boolean
+  backoffFactor?: number
+  verbose?: boolean
 }
 
 export class PollUntil {
