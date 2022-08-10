@@ -101,10 +101,11 @@ pollUntilPromise
 const options = {
     interval: 100,
     backoffFactor: 1, // Exponential interval increase. Defaults to 1, which means no backoff
+    backoffMaxInterval: 250, // Sets a maximum interval when using backoff. Defaults to the timeout value
     timeout: 1000,
     stopOnFailure: false, // Ignores promise rejections
     verbose: false,
-    message: 'Waiting for time to pass :)', // custom message to display on failure 
+    message: 'Waiting for time to pass :)', // custom message to display on failure
 };
 let pollUntilPromise = new PollUntil(options);
 ```
