@@ -355,6 +355,26 @@ describe('Unit: Wait Until Factory', () => {
       });
   });
 
+  it('should respect max interval during backoff if defined', async () => {
+    const baseInterval = 10;
+    const backoffFactor = 2;
+    const backoffMaxInterval = 24;
+
+    shouldHaltPromiseResolve = true;
+    tryingAttemptsRemaining = 4;
+
+    const pollUntil = new PollUntil({ backoffFactor, backoffMaxInterval });
+
+    const mockPromise = jest.fn(() => someRandPromise(0));
+
+    return pollUntil
+      .tryEvery(baseInterval)
+      .execute(mockPromise)
+      .then(() => {
+        expect(pollUntil._interval).toEqual(backoffMaxInterval);
+      });
+  });
+
   it('wait for should retry in sync function that throws errors', async () => {
     let counter = 0;
     let error: Error | any = null;

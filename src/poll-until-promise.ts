@@ -24,6 +24,7 @@ export interface IWaitForOptions {
   message?: string
   stopOnFailure?: boolean
   backoffFactor?: number
+  backoffMaxInterval?: number
   verbose?: boolean
 }
 
@@ -32,6 +33,7 @@ export class PollUntil {
   _timeout: number;
   private _stopOnFailure: boolean;
   private readonly _backoffFactor: number;
+  private readonly _backoffMaxInterval: number;
   private readonly _Console: Console;
   private readonly originalStacktraceError: Error;
   private readonly _userMessage: string;
@@ -51,6 +53,7 @@ export class PollUntil {
     stopOnFailure = false,
     verbose = false,
     backoffFactor = 1,
+    backoffMaxInterval,
     message = '',
   }:IWaitForOptions = {}) {
     this._interval = interval;
@@ -63,6 +66,7 @@ export class PollUntil {
     this.originalStacktraceError = new Error();
     this._Console = console;
     this._backoffFactor = backoffFactor;
+    this._backoffMaxInterval = backoffMaxInterval || timeout;
     this.start = +Date.now();
   }
 
@@ -124,8 +128,10 @@ export class PollUntil {
 
   _executeAgain() {
     this._log('executing again');
-    this._interval *= this._backoffFactor;
-    setTimeout(this._runFunction.bind(this), this._interval);
+    const currentInterval = this._interval;
+    const nextInterval = currentInterval * this._backoffFactor;
+    this._interval = (nextInterval > this._backoffMaxInterval) ? this._backoffMaxInterval : nextInterval;
+    setTimeout(this._runFunction.bind(this), currentInterval);
   }
 
   _failedToWait() {
