@@ -1,6 +1,5 @@
-[![Build Status][travis-image]][travis-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM Version][npm-image]][npm-url]
+![Build](https://github.com/AlonMiz/poll-until-promise/actions/workflows/nodejs/badge.svg)
 
 
 # Poll Until Promise
@@ -149,11 +148,5 @@ pollUntilPromise
 
 ```
 
-[travis-url]: https://travis-ci.org/AlonMiz/poll-until-promise
-[travis-image]: https://travis-ci.org/AlonMiz/poll-until-promise.svg?branch=master
-
 [npm-url]: https://npmjs.org/package/poll-until-promise
 [npm-image]: https://img.shields.io/npm/v/poll-until-promise.svg
-
-[coveralls-url]: https://coveralls.io/github/AlonMiz/poll-until-promise
-[coveralls-image]: https://img.shields.io/coveralls/AlonMiz/poll-until-promise.svg
