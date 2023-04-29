@@ -327,7 +327,7 @@ describe('Unit: Wait Until Factory', () => {
         alon();
       }, options2), options1);
     } catch (e: Error | any) {
-      expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
+      expect(e.message).toMatch(/Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something\nFailed to wait after \d+ms \(total of \d+ attempts\): waiting for another thing/);
       expect(e.stack).toMatch(/alon/);
     }
   });
@@ -342,7 +342,7 @@ describe('Unit: Wait Until Factory', () => {
     } catch (e) {
       error = e;
     }
-    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something\nsome error message$/);
   });
 
   it('wait for should save the original stacktrace', async () => {
@@ -356,7 +356,7 @@ describe('Unit: Wait Until Factory', () => {
     } catch (e) {
       error = e;
     }
-    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something$/);
     expect(error?.stack).toMatch(/customFunction/);
   });
 
@@ -444,7 +444,7 @@ describe('Unit: Wait Until Factory', () => {
 
     const mockPromise = jest.fn().mockRejectedValue(error);
 
-    await expect(pollUntil.execute(mockPromise)).rejects.toThrow('Operation unsuccessful after 3 attempts\nwhoops');
+    await expect(pollUntil.execute(mockPromise)).rejects.toThrow(/Operation unsuccessful after 3 attempts \(total of \d+ms\)\nwhoops/);
   });
 
   it('should not fail if max attempts not exceeded', async () => {

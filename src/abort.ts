@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export class AbortError extends Error {
   cause: Error;
 

@@ -34,7 +34,7 @@ export interface IWaitForOptions {
 export class PollUntil {
   _interval: number;
   _timeout: number;
-  _attemptCount: number;
+  _executedAttempts: number;
   private _stopOnFailure: boolean;
   private readonly _backoffFactor: number;
   private readonly _backoffMaxInterval: number;
@@ -64,7 +64,7 @@ export class PollUntil {
   }:IWaitForOptions = {}) {
     this._interval = interval;
     this._timeout = timeout;
-    this._attemptCount = 1;
+    this._executedAttempts = 0;
     this._stopOnFailure = stopOnFailure;
     this._isWaiting = false;
     this._isResolved = false;
@@ -135,7 +135,7 @@ export class PollUntil {
   }
 
   _attemptsExhausted() {
-    return this._maxAttempts !== undefined && this._attemptCount > this._maxAttempts;
+    return this._maxAttempts !== undefined && this._executedAttempts >= this._maxAttempts;
   }
 
   _executeAgain() {
@@ -143,14 +143,15 @@ export class PollUntil {
     const currentInterval = this._interval;
     const nextInterval = currentInterval * this._backoffFactor;
     this._interval = (nextInterval > this._backoffMaxInterval) ? this._backoffMaxInterval : nextInterval;
-    this._attemptCount += 1;
+    this._executedAttempts += 1;
     setTimeout(this._runFunction.bind(this), currentInterval);
   }
 
   _failedToWait() {
+    const timeFromStartStr = `${this._timeFromStart()}ms`;
     let waitErrorText = this._attemptsExhausted()
-      ? `Operation unsuccessful after ${this._maxAttempts} attempts`
-      : `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+      ? `Operation unsuccessful after ${this._executedAttempts} attempts (total of ${timeFromStartStr})`
+      : `${ERRORS.FAILED_TO_WAIT} after ${timeFromStartStr} (total of ${this._executedAttempts} attempts)`;
     if (this._userMessage) waitErrorText = `${waitErrorText}: ${this._userMessage}`;
     if (this._lastError) {
       this._lastError.message = `${waitErrorText}\n${this._lastError.message}`;

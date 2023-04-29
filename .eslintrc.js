@@ -14,6 +14,7 @@ module.exports = {
   },
   "rules": {
     "@typescript-eslint/lines-between-class-members" : 0,
+    "import/prefer-default-export": 0,
     "no-underscore-dangle": 0,
     "max-len": 0
   }
