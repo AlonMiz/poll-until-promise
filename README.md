@@ -1,5 +1,5 @@
 [![NPM Version][npm-image]][npm-url]
-![Build](https://github.com/AlonMiz/poll-until-promise/actions/workflows/nodejs/badge.svg)
+![Build](https://github.com/AlonMiz/poll-until-promise/actions/workflows/nodejs.yml/badge.svg)
 
 
 # Poll Until Promise
