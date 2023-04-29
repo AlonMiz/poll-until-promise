@@ -1,3 +1,5 @@
+import { AbortError } from './abort';
+
 const ERRORS = {
   NOT_FUNCTION: 'Your executor is not a function. functions and promises are valid.',
   FAILED_TO_WAIT: 'Failed to wait',
@@ -26,11 +28,13 @@ export interface IWaitForOptions {
   backoffFactor?: number
   backoffMaxInterval?: number
   verbose?: boolean
+  maxAttempts?: number
 }
 
 export class PollUntil {
   _interval: number;
   _timeout: number;
+  _executedAttempts: number;
   private _stopOnFailure: boolean;
   private readonly _backoffFactor: number;
   private readonly _backoffMaxInterval: number;
@@ -38,6 +42,7 @@ export class PollUntil {
   private readonly originalStacktraceError: Error;
   private readonly _userMessage: string;
   private readonly _verbose: boolean;
+  private readonly _maxAttempts: number | undefined;
   private _isWaiting: boolean;
   private _isResolved: boolean;
   private _executeFn: IExecuteFunction;
@@ -55,9 +60,11 @@ export class PollUntil {
     backoffFactor = 1,
     backoffMaxInterval,
     message = '',
+    maxAttempts,
   }:IWaitForOptions = {}) {
     this._interval = interval;
     this._timeout = timeout;
+    this._executedAttempts = 0;
     this._stopOnFailure = stopOnFailure;
     this._isWaiting = false;
     this._isResolved = false;
@@ -67,6 +74,7 @@ export class PollUntil {
     this._Console = console;
     this._backoffFactor = backoffFactor;
     this._backoffMaxInterval = backoffMaxInterval || timeout;
+    this._maxAttempts = maxAttempts;
     this.start = +Date.now();
   }
 
@@ -123,7 +131,11 @@ export class PollUntil {
   }
 
   _shouldStopTrying() {
-    return this._timeFromStart() > this._timeout;
+    return this._timeFromStart() > this._timeout || this._attemptsExhausted();
+  }
+
+  _attemptsExhausted() {
+    return this._maxAttempts !== undefined && this._executedAttempts >= this._maxAttempts;
   }
 
   _executeAgain() {
@@ -131,11 +143,15 @@ export class PollUntil {
     const currentInterval = this._interval;
     const nextInterval = currentInterval * this._backoffFactor;
     this._interval = (nextInterval > this._backoffMaxInterval) ? this._backoffMaxInterval : nextInterval;
+    this._executedAttempts += 1;
     setTimeout(this._runFunction.bind(this), currentInterval);
   }
 
   _failedToWait() {
-    let waitErrorText = `${ERRORS.FAILED_TO_WAIT} after ${this._timeFromStart()}ms`;
+    const timeFromStartStr = `${this._timeFromStart()}ms`;
+    let waitErrorText = this._attemptsExhausted()
+      ? `Operation unsuccessful after ${this._executedAttempts} attempts (total of ${timeFromStartStr})`
+      : `${ERRORS.FAILED_TO_WAIT} after ${timeFromStartStr} (total of ${this._executedAttempts} attempts)`;
     if (this._userMessage) waitErrorText = `${waitErrorText}: ${this._userMessage}`;
     if (this._lastError) {
       this._lastError.message = `${waitErrorText}\n${this._lastError.message}`;
@@ -171,6 +187,10 @@ export class PollUntil {
         this._log(`then done waiting with result: ${result}`);
       })
       .catch((err: Error) => {
+        if (err instanceof AbortError) {
+          this._log(`aborted with err: ${err.cause}`);
+          return this.reject?.(err.cause);
+        }
         if (this._stopOnFailure) {
           this._log(`stopped on failure with err: ${err}`);
           return this.reject?.(err);

@@ -25,7 +25,7 @@ waitFor(() => fetch('/get-data'), { interval: 100 })
 
 ### Using async
 ```js
-import { waitFor } from 'poll-until-promise';
+import { waitFor, AbortError } from 'poll-until-promise';
 
 async function waitForDomElement(cssSelector = 'div') {
   try {
@@ -34,7 +34,7 @@ async function waitForDomElement(cssSelector = 'div') {
       if (!element) throw new Error(`failed to find element: ${cssSelector}`);
       return element;
     }, { timeout: 60_000 });
-    
+
     return element;
   } catch (e) {
     console.error('faled to find dom element:', e);
@@ -46,6 +46,12 @@ async function retryFetch(path = '/get-data') {
   try {
     const data = await waitFor(async () => {
       const res = await fetch(path);
+
+      // Stop immediately if the resource doesn't exist
+      if (res.status === 404) {
+        throw new AbortError(res.statusText);
+      }
+
       return res.json();
     }, { timeout: 60_000, interval: 1000 });
   } catch (e) {
@@ -105,6 +111,7 @@ const options = {
     stopOnFailure: false, // Ignores promise rejections
     verbose: false,
     message: 'Waiting for time to pass :)', // custom message to display on failure
+    maxAttempts: 5, // maximum attempts to make (default: no limit). Will still fail to wait if reaching timeout before attempts exhausted
 };
 let pollUntilPromise = new PollUntil(options);
 ```

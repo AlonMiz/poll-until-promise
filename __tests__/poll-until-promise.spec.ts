@@ -1,4 +1,6 @@
-import { IWaitForOptions, PollUntil, waitFor } from '../src';
+import {
+  AbortError, IWaitForOptions, PollUntil, waitFor,
+} from '../src';
 
 describe('Unit: Wait Until Factory', () => {
   let options: IWaitForOptions = {
@@ -178,22 +180,68 @@ describe('Unit: Wait Until Factory', () => {
       });
   });
 
-  it('should fail wait after timeout', (done) => {
+  it('should fail wait after timeout when stopOnFailure is false', async () => {
     const pollUntil = new PollUntil();
-    shouldHaltPromiseResolve = true;
-    shouldRejectAfterHalt = true;
     const errorContent = 'error abcdefg';
     const specificFailedError = new Error(errorContent);
-    pollUntil
-      .tryEvery(1)
-      .stopAfter(3000)
-      .stopOnFailure(false)
-      .execute(() => Promise.reject(specificFailedError))
-      .catch((error) => {
-        expect(error.message).toContain('Failed to wait');
-        expect(error.message).toContain(errorContent);
-        done();
-      });
+    const mockPromise = jest.fn(() => Promise.reject(specificFailedError));
+
+    expect.assertions(3);
+    try {
+      await pollUntil
+        .tryEvery(1)
+        .stopAfter(50)
+        .stopOnFailure(false)
+        .execute(mockPromise);
+    } catch (err) {
+      const error = err as Error;
+      expect(error.message).toContain('Failed to wait');
+      expect(error.message).toContain(errorContent);
+      expect(mockPromise.mock.calls.length).toBeGreaterThan(1);
+    }
+  });
+
+  it('should fail immediately for AbortError when stopOnFailure is false -- passing Error arg', async () => {
+    const pollUntil = new PollUntil();
+    const errorContent = 'error abcdefg';
+    const specificFailedError = new Error(errorContent);
+    const abortError = new AbortError(specificFailedError);
+    const mockPromise = jest.fn(() => Promise.reject(abortError));
+
+    expect.assertions(3);
+    try {
+      await pollUntil
+        .tryEvery(1)
+        .stopAfter(50)
+        .stopOnFailure(false)
+        .execute(mockPromise);
+    } catch (err) {
+      const error = err as Error;
+      expect(error.message).not.toContain('Failed to wait');
+      expect(error.message).toContain(errorContent);
+      expect(mockPromise.mock.calls.length).toBe(1);
+    }
+  });
+
+  it('should fail immediately for AbortError when stopOnFailure is false -- passing string arg', async () => {
+    const pollUntil = new PollUntil();
+    const errorContent = 'error abcdefg';
+    const abortError = new AbortError(errorContent);
+    const mockPromise = jest.fn(() => Promise.reject(abortError));
+
+    expect.assertions(3);
+    try {
+      await pollUntil
+        .tryEvery(1)
+        .stopAfter(50)
+        .stopOnFailure(false)
+        .execute(mockPromise);
+    } catch (err) {
+      const error = err as Error;
+      expect(error.message).not.toContain('Failed to wait');
+      expect(error.message).toContain(errorContent);
+      expect(mockPromise.mock.calls.length).toBe(1);
+    }
   });
 
   it('should execute a second waiting when waiting is done (exceeded timeout) but not resolved', (done) => {
@@ -279,7 +327,7 @@ describe('Unit: Wait Until Factory', () => {
         alon();
       }, options2), options1);
     } catch (e: Error | any) {
-      expect(e.message).toMatch(/Failed to wait after \d+ms: waiting for something\nFailed to wait after \d+ms: waiting for another thing/);
+      expect(e.message).toMatch(/Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something\nFailed to wait after \d+ms \(total of \d+ attempts\): waiting for another thing/);
       expect(e.stack).toMatch(/alon/);
     }
   });
@@ -294,7 +342,7 @@ describe('Unit: Wait Until Factory', () => {
     } catch (e) {
       error = e;
     }
-    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something\nsome error message$/);
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something\nsome error message$/);
   });
 
   it('wait for should save the original stacktrace', async () => {
@@ -308,7 +356,7 @@ describe('Unit: Wait Until Factory', () => {
     } catch (e) {
       error = e;
     }
-    expect(error?.message).toMatch(/^Failed to wait after \d+ms: waiting for something$/);
+    expect(error?.message).toMatch(/^Failed to wait after \d+ms \(total of \d+ attempts\): waiting for something$/);
     expect(error?.stack).toMatch(/customFunction/);
   });
 
@@ -388,5 +436,26 @@ describe('Unit: Wait Until Factory', () => {
     }
     expect(counter).toBeGreaterThan(1);
     expect(error).not.toBeNull();
+  });
+
+  it('should fail if max attempts exceeded', async () => {
+    const pollUntil = new PollUntil({ maxAttempts: 3, interval: 1 });
+    const error = new Error('whoops');
+
+    const mockPromise = jest.fn().mockRejectedValue(error);
+
+    await expect(pollUntil.execute(mockPromise)).rejects.toThrow(/Operation unsuccessful after 3 attempts \(total of \d+ms\)\nwhoops/);
+  });
+
+  it('should not fail if max attempts not exceeded', async () => {
+    const pollUntil = new PollUntil({ maxAttempts: 3, interval: 1 });
+    const error = new Error('whoops');
+
+    const mockPromise = jest.fn()
+      .mockRejectedValueOnce(error)
+      .mockRejectedValueOnce(error)
+      .mockResolvedValue({ fake: 'result' });
+
+    expect(await pollUntil.execute(mockPromise)).toEqual({ fake: 'result' });
   });
 });
